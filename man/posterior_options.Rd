@@ -17,11 +17,27 @@ posterior_options(save_UV = FALSE, save_ab = FALSE, thin_UV = 10, thin_ab = 10)
 }
 \value{
 List of posterior saving options, to be passed to the
-\code{posterior_opts} argument of \code{\link{ame}}:
-\code{ame(Y, ..., posterior_opts = posterior_options(save_UV = TRUE))}
+\code{posterior_opts} argument of \code{\link{ame}} or \code{\link{lame}}:
+\code{ame(Y, ..., posterior_opts = posterior_options(save_UV = TRUE))} or
+\code{lame(Y, ..., posterior_opts = posterior_options(save_UV = TRUE))}.
+With \code{save_UV = TRUE}, static fits store \code{U_samples} /
+\code{V_samples} (plus \code{G_samples} for bipartite fits) and
+\code{dynamic_uv} fits store the per-period trajectory in
+\code{U_draws} / \code{V_draws}; see \code{\link{latent_positions}} and
+\code{\link{simulate_posterior}} for summarising them. With
+\code{save_ab = TRUE}, static effects use \code{a_samples} /
+\code{b_samples} (the same draws in both for a symmetric fit, which has
+one effect per actor); longitudinal dynamic effects use
+actor-by-period-by-draw arrays \code{a_draws} / \code{b_draws}. \code{thin_ab} is measured
+in retained coefficient draws; \code{thin_ab = 1} keeps them aligned.
 }
 \description{
 Options for saving posterior samples during MCMC
+}
+\examples{
+opts <- posterior_options(save_UV = TRUE, thin_UV = 5)
+opts
+
 }
 \author{
 Cassy Dorff, Shahryar Minhas, Tosin Salau

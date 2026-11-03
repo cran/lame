@@ -4,7 +4,18 @@
 \alias{get_start_vals}
 \title{Get fitted object from MCMC results}
 \usage{
-get_start_vals(start_vals, Y, family, xP, rvar, cvar, R, odmax = NULL)
+get_start_vals(
+  start_vals,
+  Y,
+  family,
+  xP,
+  rvar,
+  cvar,
+  R,
+  odmax = NULL,
+  bip = FALSE,
+  unit_var = 1
+)
 }
 \arguments{
 \item{start_vals}{List object that is null or contains
@@ -26,6 +37,15 @@ effects}
 \item{R}{Number of dimensions for multiplicative effects}
 
 \item{odmax}{vector of maximum ranks for cbin/frn families (optional)}
+
+\item{bip}{logical; \code{TRUE} for a bipartite (rectangular) panel, in
+which case the Poisson start values keep the diagonal of a square matrix
+as a real cell}
+
+\item{unit_var}{the unit of the response, the variance a normal response
+is measured in (1 where the link fixes the scale of the latent response):
+the starting dyadic variance, the spread of the starting coefficients and
+the floor of the starting covariance of the effects are written in it}
 }
 \value{
 List of starting values for MCMC
@@ -33,6 +53,17 @@ List of starting values for MCMC
 \description{
 Get fitted object from MCMC results
 }
+\details{
+In addition to the slots listed below, any of the dynamic
+hyperparameter scalars \code{rho_uv}, \code{sigma_uv}, \code{rho_ab},
+and \code{sigma_ab} present in \code{start_vals} (for example from
+\code{\link{als_start_vals}}) are passed through so a dynamic MCMC run
+can warm-start them, as are the adapted step sizes
+\code{level_move_sd} and \code{dev_move_sd} of the binary scale move, so
+that a run continued with \code{\link{lame_resume}} keeps the step it
+had tuned rather than re-adapting from the default.
+}
 \author{
 Shahryar Minhas
 }
+\keyword{internal}

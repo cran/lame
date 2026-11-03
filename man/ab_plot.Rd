@@ -6,7 +6,7 @@
 \usage{
 ab_plot(
   fit,
-  effect = c("sender", "receiver"),
+  effect = c("sender", "receiver", "both"),
   sorted = TRUE,
   labels = NULL,
   title = NULL,
@@ -19,7 +19,12 @@ ab_plot(
 \item{fit}{An object of class "ame" or "lame" from fitting an AME model}
 
 \item{effect}{Character string specifying which effect to plot:
-"sender" (default) or "receiver"}
+"sender" (default), "receiver", or "both". "both" draws the sender
+and receiver effects as two panels, each sorted on its own; for
+dynamic fits it is available in the snapshot views
+(\code{plot_type = "snapshot"}, one period or
+\code{time_point = "average"}). Symmetric fits store a single set
+of actor effects, so only "sender" applies to them.}
 
 \item{sorted}{Logical; if TRUE (default), actors are sorted by effect
 magnitude. Applies to \code{ame} / \code{lame} fits;
@@ -68,8 +73,9 @@ are available to visualize how effects evolve over time.
 \donttest{
 # Fit an AME model
 data(YX_nrm)
+# chains = 1 keeps the example short; the default runs two chains and compares them
 fit <- ame(YX_nrm$Y, Xdyad = YX_nrm$X,
-           nscan = 100, burn = 10, odens = 1, verbose = FALSE)
+           nscan = 100, burn = 10, odens = 1, verbose = FALSE, chains = 1)
 
 # Visualize sender effects
 ab_plot(fit, effect = "sender")
