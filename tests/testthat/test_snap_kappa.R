@@ -1,6 +1,7 @@
 # the snap kind's reset scale: by default a reset is a fresh draw from the stationary law of the position paths
 # (kappa^2 = sigma_uv^2 / (1 - rho_uv^2)) and enters the rho_uv and sigma_uv conditionals; a user-set
 # prior$snap_kappa is a fixed scale that keeps the reset positions out of them
+skip_on_cran()
 
 snap_state = function(seed, n = 40, R = 2, TT = 5, rho = 0.7, sigma = 0.4, pi = 0.2) {
 	set.seed(seed)

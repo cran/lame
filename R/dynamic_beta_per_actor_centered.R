@@ -98,8 +98,7 @@
 	sigma2,
 	rho_current,
 	prior_a = 2,
-	prior_b = 2,
-	sd_prop = 0.05
+	prior_b = 2
 ) {
 	dimension <- max(0L, nrow(theta) - 1L)
 	log_density <- function(rho) {

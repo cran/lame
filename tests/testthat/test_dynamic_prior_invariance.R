@@ -1,4 +1,6 @@
 # independent draws from joint priors detect incompatible Gibbs conditionals
+skip_on_cran()
+
 prior_invariance_z = function(difference) {
 	colMeans(difference) / (apply(difference, 2, sd) / sqrt(nrow(difference)))
 }

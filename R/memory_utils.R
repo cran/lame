@@ -43,7 +43,7 @@ compact_ame <- function(fit, use_sparse_matrices = FALSE) {
 		return(compact_fit)
 	}
 
-	if (use_sparse_matrices && requireNamespace("Matrix", quietly = TRUE)) {
+	if (requireNamespace("Matrix", quietly = TRUE)) {
 		# YPM and EZ (per-period lists for lame) become sparse only when their nonzero
 		# density, counting NA cells, is below 0.5; APM and BPM stay numeric vectors
 		sparsify_matrix <- function(m) {
@@ -60,15 +60,9 @@ compact_ame <- function(fit, use_sparse_matrices = FALSE) {
 			}
 		}
 		cli::cli_inform("Sparse storage applied to posterior-mean matrices with nonzero density below {.val {0.5}}; denser matrices kept dense.")
-	} else if (use_sparse_matrices) {
+	} else {
 		cli::cli_warn("Matrix package not available; using dense storage")
 	}
-
-	# posterior samples
-	if (!is.null(fit$U_samples)) compact_fit$U_samples <- fit$U_samples
-	if (!is.null(fit$V_samples)) compact_fit$V_samples <- fit$V_samples
-	if (!is.null(fit$a_samples)) compact_fit$a_samples <- fit$a_samples
-	if (!is.null(fit$b_samples)) compact_fit$b_samples <- fit$b_samples
 
 	class(compact_fit) <- class(fit)
 	return(compact_fit)
@@ -189,14 +183,19 @@ ame_memory_settings <- function(n_nodes, R = 2) {
 	cli::cli_text("  - Each n x n matrix: {.val {round(matrix_size_mb, 1)}} MB")
 	cli::cli_text("  - Factor matrices (U,V): {.val {round(factor_size_mb, 1)}} MB")
 
-	# totals for each storage configuration
+	# totals for each storage configuration; networks of more than 100 nodes keep YPM only
 	full_size <- matrix_size_mb * 3 + factor_size_mb # YPM, EZ, UVPM and factors
-	optimized_size <- matrix_size_mb + factor_size_mb # YPM and factors
+	ypm_only <- n_nodes > 100
+	optimized_size <- if (ypm_only) matrix_size_mb + factor_size_mb else full_size
 
 	cli::cli_text("")
 	cli::cli_text("Memory usage by configuration:")
 	cli::cli_text("  - All posterior-mean matrices (YPM, EZ, UVPM): {.val {round(full_size, 1)}} MB")
-	cli::cli_text("  - YPM only: {.val {round(optimized_size, 1)}} MB")
+	if (ypm_only) {
+		cli::cli_text("  - Optimized (YPM only, for n > 100): {.val {round(optimized_size, 1)}} MB")
+	} else {
+		cli::cli_text("  - Optimized (all matrices kept for n <= 100): {.val {round(optimized_size, 1)}} MB")
+	}
 
 	cli::cli_text("")
 	cli::cli_text("Recommendations:")
@@ -210,7 +209,7 @@ ame_memory_settings <- function(n_nodes, R = 2) {
 	invisible(list(
 		matrix_mb = matrix_size_mb,
 		factor_mb = factor_size_mb,
-		total_mb = matrix_size_mb * 3 + factor_size_mb,
-		optimized_mb = if (n_nodes > 100) matrix_size_mb + factor_size_mb else matrix_size_mb * 3 + factor_size_mb
+		total_mb = full_size,
+		optimized_mb = optimized_size
 	))
 }

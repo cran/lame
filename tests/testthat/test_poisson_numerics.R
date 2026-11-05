@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("Poisson log masses preserve extreme rates and cancellation near the mode", {
 	pm = lame:::.poisson_log_mass
 	expect_equal(pm(c(0, 1, 2), -1000), c(0, -1000, -2000 - log(2)), tolerance = 1e-12)

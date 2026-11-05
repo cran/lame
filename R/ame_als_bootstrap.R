@@ -1374,7 +1374,7 @@ ame_als_refit <- function(
 	cli::cli_abort(
 		c(
 			"A bootstrap is not available for an uncorrected binary fixed-effects fit.",
-			"x" = "The fit is biased by the incidental-parameters problem and every replicate reproduces the bias, so the 95% interval sits about twice the bias from the truth: in simulated panels it covered the dyadic coefficient in 54% of 100 panels of 30 actors and one period, 72% at 60 actors and two periods, 76% at 100 and two, and 84% at 30 and four.",
+			"x" = "The fit is biased by the incidental-parameters problem and every replicate reproduces the bias, so the interval is centred away from the truth.",
 			"i" = "Bootstrap the default empirical-Bayes fit (omit {.arg bias_correct}), or a fit corrected with {.code bias_correct = \"jackknife\"} or {.code \"bootstrap\"}, or use MCMC with {.fn ame} / {.fn lame}."
 		),
 		class = c("lame_als_bootstrap_bias", "lame_als_bootstrap_unsupported")

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("zero opposing factors retain the exact prior conditional", {
 	skip_on_cran()
 	set.seed(47315401L)

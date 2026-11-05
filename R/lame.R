@@ -1280,8 +1280,7 @@
 					ev,
 					" events per actor-period, below ",
 					thr,
-					", and in simulated panels their 95 percent intervals covered the ",
-					"generating variances in 0.28 to 0.91 of the panels below that rate and in 0.91 or more from it. ",
+					", too few for their intervals to cover the generating variances. ",
 					"The draws are in fit$VC; supplying prior$Sab0 or prior$eta0 reports them under that prior."
 				)
 			)
@@ -1298,7 +1297,7 @@
 				.lame_cap_shrunk_va[1L],
 				" and ",
 				.lame_cap_shrunk_va[2L],
-				", where in simulated panels of 4 and 6 periods the 95 percent interval of the intercept covered 0.89 of the panels (0.76 at generating sender sds of 0.5 and 1.5) against 0.96 elsewhere. The draws are in fit$BETA. va is estimated there: its interval covered 0.91 of the panels (0.79 and 0.72 at sds of 0.5 and 1.5), against 0.99 elsewhere."
+				", where the cap hides the level of the rows. The draws are in fit$BETA. va is estimated."
 			)
 		)
 	}
@@ -1312,8 +1311,7 @@
 				" events per actor-period, below ",
 				thr,
 				if (thr > .lame_sparse_period_rate_intercept) " for a fit with a multiplicative term" else "",
-				", and in simulated panels its 95 percent interval covered the generating value in 0.57 to 0.87 of the panels below that rate ",
-				"and in 0.92 or more from it. The draws are in fit$BETA."
+				", too few for its interval to cover the generating value. The draws are in fit$BETA."
 			)
 		)
 	}
@@ -1325,8 +1323,8 @@
 			paste0(
 				"The intercept and any row-covariate coefficient are not estimated: ",
 				.lame_sat_phrase(share, hidden),
-				" in a one-period design, where a row at its cap shows only that its level fills the cap and nothing bounds the level of a row above; ",
-				"in simulated one-period designs their 95 percent intervals covered 0.64 of the panels with every row at the cap and 0.84 of those with cells hidden and a share from 0.5, against 0.98 or more elsewhere. va, vb and cab are estimated. The draws are in fit$BETA."
+				" in a one-period design, where a row at its cap shows only that its level fills the cap and nothing bounds the level of a row above. ",
+				"va, vb and cab are estimated. The draws are in fit$BETA."
 			)
 		)
 	}
@@ -2542,11 +2540,11 @@
 #' factors). The transition model is selected by \code{dynamic_uv_kind}.
 #' A directed fit with dynamic positions carries the dyadic correlation of
 #' \code{dcor} through the position kernel (see \code{dcor}).
-#' \code{fit$U} / \code{fit$V} store only the posterior-mean trajectory cubes;
-#' draw-level trajectory uncertainty requires refitting with
-#' \code{posterior_opts = list(save_UV_draws = TRUE)}, which attaches the
-#' per-iteration cubes as \code{fit$U_draws} / \code{fit$V_draws}. Default
-#' \code{FALSE}.
+#' \code{fit$U} / \code{fit$V} hold the positions factored from each period's
+#' posterior mean product (see \code{\link{latent_positions}}); the per-iteration
+#' cubes are kept as \code{fit$U_draws} / \code{fit$V_draws} by the default
+#' \code{posterior_opts} (or with \code{posterior_opts = list(save_UV_draws =
+#' TRUE)}), and give the posterior standard deviations. Default \code{FALSE}.
 #' With \code{method = "als"} and a normal, binary or Poisson outcome the positions are
 #' estimated by the dynamic empirical-Bayes estimator (see
 #' \code{bias_correct}): \code{fit$U} and \code{fit$V} are the posterior means
@@ -3781,20 +3779,23 @@
 #' mean of additive column effects b}
 #' \item{APM_sd, BPM_sd}{posterior standard deviation of each additive effect
 #'   (static effects), used by \code{simulate()} to draw the effects}
-#' \item{U}{posterior mean of multiplicative
-#' row effects u. For dynamic_uv=TRUE, this is a 3D array (n x R x T)}
-#' \item{V}{posterior mean of multiplicative column effects v (asymmetric case).
-#' For dynamic_uv=TRUE, this is a 3D array (n x R x T)}
-#' \item{U_sd, V_sd}{for \code{dynamic_uv = TRUE}, the per-period posterior
-#' standard deviation of each latent coordinate, same shape as \code{U} and
-#' \code{V}; \code{latent_positions()} reports them as \code{posterior_sd}}
+#' \item{U}{multiplicative row effects u. For \code{dynamic_uv = TRUE}, a 3D
+#'   array (n x R x T) whose periods factor the posterior mean product of each
+#'   period at rank R and are aligned across periods; \code{NA} for an actor
+#'   absent from a period (see \code{\link{latent_positions}})}
+#' \item{V}{multiplicative column effects v (asymmetric case), with the same
+#'   layout as \code{U}}
+#' \item{U_sd, V_sd}{for \code{dynamic_uv = TRUE} with saved latent draws (the
+#'   default), the posterior standard deviation of each reported coordinate,
+#'   same shape as \code{U} and \code{V}; \code{latent_positions()} reports
+#'   them as \code{posterior_sd}}
 #' \item{UVPM}{on the union of actors; under changing composition the dynamic array has NA rows and columns for actors absent from a period, and a static fit gives one matrix for every pair. posterior mean of UV}
 #' \item{ULUPM}{posterior mean of ULU (symmetric case)}
 #' \item{L}{for symmetric fits, the diagonal of the product \eqn{U L U'}: the
-#'   eigenvalues of \code{ULUPM} when the positions are static, and when they
-#'   are dynamic the posterior mean of the diagonal drawn every sweep, the
-#'   coordinate paths then having unit stationary variance so that \code{L}
-#'   carries the scale and the sign of each direction}
+#'   eigenvalues of \code{ULUPM} when the positions are static; when they are
+#'   dynamic, one diagonal for every period that carries the scale and sign of
+#'   each direction, so that \eqn{U_t L U_t'} is the best rank-R part of each
+#'   period's \code{ULUPM} with those signs}
 #'  \item{EZ}{posterior mean of the linear predictor Z, on the link scale
 #' for every family (the log rate for Poisson, the probit scale for the
 #' binary, ordinal, cbin and frn families); \code{YPM} is the response-scale
@@ -3938,7 +3939,10 @@
 #'   inverse-gamma scale of the coefficient innovation variance, fixed before
 #'   sampling from the response scale}
 #' \item{G}{for bipartite fits, the interaction matrix of \eqn{U G V'}: the
-#'   posterior mean of the gauged draws}
+#'   posterior mean of the gauged draws when the positions are static; when they
+#'   are dynamic, a diagonal matrix fixed across periods that carries the scale,
+#'   so that \eqn{U_t G V_t'} is the best rank-R part of each period's
+#'   \code{UVPM}}
 #' \item{GOF}{a named list with one element per goodness-of-fit statistic
 #' (\code{sd.rowmean}, \code{sd.colmean}, \code{dyad.dep}, \code{cycle.dep},
 #' \code{trans.dep}; for \code{mode = "bipartite"}, \code{sd.rowmean},
@@ -5598,7 +5602,7 @@ lame <- function(
 			dynamic_uv_kind %in% c("snap", "t")) {
 		cli::cli_abort(c(
 			"{.arg dynamic_uv_kind = \"{dynamic_uv_kind}\"} is not available for symmetric fits on the MCMC path.",
-			"i" = "Use {.arg dynamic_uv_kind = \"ar1\"}: on simulated panels it recovered snap- and t-generated paths as well as the specialised kinds."
+			"i" = "Use {.arg dynamic_uv_kind = \"ar1\"}, which also follows paths with resets or heavy-tailed steps."
 		))
 	}
 	if (dynamic_uv && verbose) {
@@ -5960,9 +5964,9 @@ lame <- function(
 			(identical(dynamic_uv_kind, "t") && !isTRUE(als_start_used)))) {
 		cli::cli_inform(c(
 			"i" = if (identical(dynamic_uv_kind, "snap")) {
-				"With {.code dynamic_uv_kind = \"snap\"} at rank two or more, {.fn summary} and {.fn print} do not report {.code rho_uv}, {.code sigma_uv} or the reset rate {.code pi_snap}: on simulated panels with known values the chains settled where extra resets stand in for drift, overstating the reset rate, and independent chains disagreed."
+				"With {.code dynamic_uv_kind = \"snap\"} at rank two or more, {.fn summary} and {.fn print} do not report {.code rho_uv}, {.code sigma_uv} or the reset rate {.code pi_snap}: extra resets stand in for drift, so the data do not separate the reset rate from the drift."
 			} else {
-				"This {.code dynamic_uv_kind = \"t\"} chain could not start from a dynamic ALS fit, so at rank two or more {.fn summary} and {.fn print} do not report {.code rho_uv} or {.code sigma_uv}: on simulated panels with known values chains started cold settled where heavy-tailed steps stand in for drift, understating {.code rho_uv} and overstating {.code sigma_uv}."
+				"This {.code dynamic_uv_kind = \"t\"} chain could not start from a dynamic ALS fit, so at rank two or more {.fn summary} and {.fn print} do not report {.code rho_uv} or {.code sigma_uv}: started cold, the chain lets heavy-tailed steps stand in for drift."
 			},
 			"i" = "The positions and the stationary spread of their paths were recovered.",
 			"i" = if (identical(dynamic_uv_kind, "snap")) {
@@ -6811,9 +6815,7 @@ lame <- function(
 		Lambda_list <- build_beta_state_scales(
 			beta_dyn,
 			XtX_per_t,
-			n_dyads_per_t,
-			g = g,
-			beta0_var = prior$beta0_var %||% beta0_var_default
+			n_dyads_per_t
 		)
 		Lambda_full <- Lambda_list[[1]]
 		# per-coefficient rho / sigma, broadcast from the per-block parameters
@@ -12558,6 +12560,13 @@ lame <- function(
 			U_DRAWS <- U_DRAWS[, , , keep, drop = FALSE]
 			V_DRAWS <- V_DRAWS[, , , keep, drop = FALSE]
 		}
+		# static position draws and bipartite G draws keep the draw in their last margin
+		for (nm in c("U_SAMPLES", "V_SAMPLES", "G_SAMPLES")) {
+			x <- if (exists(nm, inherits = FALSE)) get(nm, inherits = FALSE) else NULL
+			if (!is.null(x) && length(dim(x)) == 3L && dim(x)[3L] == n_planned_draws) {
+				assign(nm, x[, , keep, drop = FALSE])
+			}
+		}
 	}
 	# compare the stored predictive-draw average with the observed level (.lame_predictive_level_check)
 	.lame_predictive_level_check(
@@ -13211,19 +13220,9 @@ lame <- function(
 			fit$EZ[[tt]] <- fit$EZ[[tt]] + offset
 		}
 	}
-	# temporal alignment of latent positions
+	# latent positions from the posterior mean products, aligned over time
 	if (isTRUE(dynamic_uv)) {
-		if (mode == "unipartite") {
-			if (!is.null(fit$U) && length(dim(fit$U)) == 3L) {
-				fit$U <- align_over_time_unip(fit$U)
-			}
-		} else {
-			if (!is.null(fit$U) && !is.null(fit[["V"]]) &&
-					length(dim(fit$U)) == 3L && length(dim(fit[["V"]])) == 3L) {
-				tmp <- align_over_time_bip(fit$U, fit[["V"]], fit[["G"]])
-				fit$U <- tmp$U; fit[["V"]] <- tmp[["V"]]; fit[["G"]] <- tmp$G
-			}
-		}
+		fit <- .lame_dynamic_positions(fit)
 		rho_hat <- estimate_rho_from_U(fit$U)
 		if (is.finite(rho_hat)) fit$rho_uv_aligned <- as.numeric(rho_hat)
 	}

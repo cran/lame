@@ -1,3 +1,5 @@
+skip_on_cran()
+
 .weighted_cycle_reference = function(Y) {
 	observed = is.finite(Y); v = Y[observed]; E = Y
 	if (length(v) < 4L || stats::sd(v) == 0) return(NA_real_)

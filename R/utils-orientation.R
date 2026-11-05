@@ -19,6 +19,22 @@ align_over_time_unip <- function(U) {
 	U_al
 }
 
+# symmetric: U [n, r, T] with U_t L U_t' fixed; only a sign change of a column
+# keeps the product for any diagonal L, so each column takes the sign that best
+# matches the period before it
+align_over_time_sym <- function(U) {
+	if (is.null(U) || length(dim(U)) != 3L) return(U)
+	Tn <- dim(U)[3]
+	if (Tn < 2L) return(U)
+	U_al <- U
+	for (t in 2:Tn) {
+		U_t <- matrix(U_al[, , t], dim(U)[1])
+		agree <- colSums(U_t * matrix(U_al[, , t - 1], dim(U)[1]), na.rm = TRUE)
+		U_al[, , t] <- sweep(U_t, 2L, ifelse(agree < 0, -1, 1), "*")
+	}
+	U_al
+}
+
 # directed unipartite: U and V [n, r, T] share one rotation per period, found
 # from the stacked positions, so U V' is unchanged
 align_over_time_unip_pair <- function(U, V) {

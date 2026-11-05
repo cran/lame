@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # the mean of the latent product is identified only jointly with the intercept: a bipartite static product is

@@ -1,7 +1,7 @@
 Package: lame
 Title: Longitudinal Additive and Multiplicative Effects Models for
         Networks
-Version: 1.4.0
+Version: 1.4.1
 Authors@R: c(
     person("Cassy", "Dorff", role = "aut"),
     person("Shahryar", "Minhas", , "minhassh@msu.edu", role = c("aut", "cre")),
@@ -30,6 +30,6 @@ VignetteBuilder: knitr
 Config/testthat/edition: 3
 SystemRequirements: C++17
 NeedsCompilation: yes
-Packaged: 2026-11-03 18:11:08 UTC; s7m
+Packaged: 2026-11-04 12:37:44 UTC; s7m
 Repository: CRAN
-Date/Publication: 2026-11-03 22:50:15 UTC
+Date/Publication: 2026-11-05 15:00:02 UTC

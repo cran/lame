@@ -1,6 +1,7 @@
 # hyperparameters of the dynamic_beta paths (R/dynamic_beta_hyper_move.R): exact conditionals of the innovation scale and
 # the persistence every sweep, and an interweaving step on (scale, persistence, path) with the standardised innovations fixed
 # checked here: the compiled sufficient statistics, the maps, the exactness of the step, and the switches
+skip_on_cran()
 
 # the sufficient statistics
 

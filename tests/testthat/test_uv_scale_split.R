@@ -1,4 +1,5 @@
 # the scale split of the static factors of a directed network (R/uv_scale_split.R)
+skip_on_cran()
 
 usp_mut = function(from, to) {
 	f = lame:::.lame_uv_split_draw

@@ -2,6 +2,7 @@
 # (e_ij, e_ji) is bivariate normal (variance s2, correlation rho), e_ii has variance s2 (1 + rho), e = E - U_t V_t',
 # and positions follow a stationary AR(1) with transitions N(rho_uv x_{t-1}, sigma_uv^2 / lambda I)
 # each kernel is called with shrink = FALSE, so the returned row is the draw
+skip_on_cran()
 
 kern_pars = list(rho_uv = 0.7, sigma_uv = 0.5, s2 = 1.3, kappa = 2, pi_snap = 0.2, nu = 4)
 

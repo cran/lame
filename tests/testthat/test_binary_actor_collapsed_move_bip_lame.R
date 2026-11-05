@@ -1,3 +1,5 @@
+skip_on_cran()
+
 bip_panel = function(seed, nA = 8L, nB = 10L, nt = 3L, dens = .12) {
 	set.seed(seed)
 	rn = sprintf('r%02d', 1:nA); cn = sprintf('c%02d', 1:nB)

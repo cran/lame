@@ -1,4 +1,5 @@
 # the moves along the ridges of the bipartite sampler (R/binary_bipartite_scale_moves.R)
+skip_on_cran()
 
 test_that('the generalised inverse Gaussian draw matches its density', {
 	skip_on_cran()

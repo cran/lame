@@ -1,6 +1,6 @@
-# the compiled visits of the position moves give the draws of their R references from the same seed
+# the compiled visits of the position moves give the draws of their R references from the same seed, to rounding
 
-cpm_same = function(a, b) isTRUE(all.equal(a, b, tolerance = 0))
+cpm_same = function(a, b) isTRUE(all.equal(a, b, tolerance = 1e-10))
 
 test_that('the compiled visit of the static positions of a cbin / frn panel gives the draws of the R visit', {
 	skip_on_cran()

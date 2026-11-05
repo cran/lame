@@ -40,7 +40,7 @@ test_that("the reasons, the hidden rows and the statements follow", {
 	st = lame:::.lame_ab_statements(fit)
 	expect_length(st, 1L)
 	expect_match(st[1], "The intercept and any row-covariate coefficient are not estimated")
-	expect_match(st[1], "va is estimated there")
+	expect_match(st[1], "va is estimated")
 	expect_match(st[1], "0\\.5 and 1\\.5")
 	expect_false(grepl("conservative|pending|caution|sensitiv", st[1]))
 	# a supplied effects prior does not identify the level of a row

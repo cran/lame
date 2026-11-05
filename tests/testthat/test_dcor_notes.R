@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("a poisson fit without overdispersion says its dyadic correlation is not identified", {
 	# this panel's latent residual has almost no variance; the note reads that variance, which the mutual-dyad count cannot see
 	skip_on_cran()

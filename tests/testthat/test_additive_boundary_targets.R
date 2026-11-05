@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that('correlated additive priors retain their near-boundary conditional', {
 	S = matrix(c(1, .9999, .9999, 1), 2);lev = c(-1, 0, 1)
 	for (k in 1:2) {p = lame:::.lame_ab_cond_prior(S, k, lev);expect_equal(p$mean, .9999 * lev);expect_equal(p$var, 1 - .9999^2)}

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("binary row conditional samples proper far tails and infinite intervals", {
 	row_draw = getFromNamespace(".lame_binary_row_truncnorm", "lame")
 	set.seed(47334151)

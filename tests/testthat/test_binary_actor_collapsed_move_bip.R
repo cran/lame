@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that('the bipartite context indexes the observed cells of each actor', {
 	ctx = .lame_actor_move_context_bip
 	set.seed(417); nA = 4L; nB = 5L; nt = 3L

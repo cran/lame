@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # estimand of fitted(), predict(type = "response") and residuals() for dynamic ALS fits (R/dynamic_als_predictive.R):

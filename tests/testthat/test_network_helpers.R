@@ -1,5 +1,6 @@
 # direct checks of the exported helpers for covariates, input conversion, held-out scoring, memory
 # reporting and binary latent draws; all fast enough for CRAN
+skip_on_cran()
 
 test_that("absdiff, nodematch and nodefactor build the dyadic arrays they document", {
 	x = c(1, 4, 6)
@@ -83,6 +84,12 @@ test_that("ame_memory_settings and ame_memory_usage report sizes", {
 		suppressMessages(ame_memory_settings(50))$total_mb
 	)
 	expect_match(paste(capture_messages(ame_memory_settings(1200)), collapse = ""), "n > 1000")
+	# the printed optimized figure is the returned one on both sides of the n > 100 rule
+	for (n in c(50, 200)) {
+		msg = gsub("\\s+", " ", paste(capture_messages(s_n <- ame_memory_settings(n)), collapse = ""))
+		expect_match(msg, paste0("Optimized [^:]*: ", round(s_n$optimized_mb, 1), " MB"))
+	}
+	expect_match(paste(capture_messages(ame_memory_settings(50)), collapse = ""), "all matrices kept")
 	fit = structure(list(BETA = matrix(0, 10, 2), YPM = matrix(0, 30, 30), APM = 1:3), class = "ame")
 	u = ame_memory_usage(fit, detailed = FALSE)
 	expect_setequal(u$Component, c("BETA", "YPM", "APM"))
@@ -94,7 +101,7 @@ test_that("ame_memory_settings and ame_memory_usage report sizes", {
 
 test_that("compact_ame drops empty slots, keeps the class and sparsifies sparse posterior means", {
 	fit = structure(
-		list(BETA = matrix(0, 2, 1), U = NULL, YPM = diag(5), EZ = list(matrix(1, 3, 3))),
+		list(BETA = matrix(0, 2, 1), U = NULL, YPM = diag(5), EZ = list(matrix(1, 3, 3)), U_samples = array(1, c(3, 1, 2))),
 		class = c("lame", "list")
 	)
 	fit["U"] = list(NULL)
@@ -104,6 +111,7 @@ test_that("compact_ame drops empty slots, keeps the class and sparsifies sparse 
 	cs = suppressMessages(compact_ame(fit, use_sparse_matrices = TRUE))
 	expect_s4_class(cs$YPM, "Matrix")
 	expect_true(is.matrix(cs$EZ[[1]]))
+	expect_identical(cs$U_samples, fit$U_samples)
 })
 
 test_that("rZ_bin_fc draws the latent array on the half-line the ties imply", {

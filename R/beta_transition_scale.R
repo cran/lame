@@ -80,9 +80,7 @@
 	lambda <- build_beta_state_scales(
 		list(dynamic_idx = expanded),
 		XtX,
-		ncells,
-		g = object$g,
-		beta0_var = object$prior$beta0_var %||% 10
+		ncells
 	)[[1L]]
 	variance <- numeric(length(names_beta))
 	for (j in seq_along(expanded)) {

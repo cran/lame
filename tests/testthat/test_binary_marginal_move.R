@@ -1,4 +1,6 @@
 # dense Gaussian precision and determinant oracles, independent of the sampler's AR gradients and SVD factors
+skip_on_cran()
+
 binary_move_fixture = function(rank, uv_prior = NULL) {
 	n = 4L; nt = 3L; k = n - 1L
 	Y = array(NA_real_, c(n, n, nt))

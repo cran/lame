@@ -58,7 +58,6 @@
 # with the predictor. `E` the residuals Z - EZ
 .lame_cov_ridge_data <- function(E, M, rho, s2) {
 	iu <- which(upper.tri(E))
-	il <- which(upper.tri(t(E)))
 	# il: the transposed partner of each cell of iu, in the same order
 	nn <- nrow(E)
 	ij <- arrayInd(iu, c(nn, nn))

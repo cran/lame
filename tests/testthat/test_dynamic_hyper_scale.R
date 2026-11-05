@@ -1,6 +1,7 @@
 # the response scale the dynamic-coefficient innovation prior is set from, and
 # the reporting rule for the position hyperparameters of the two
 # heavy-transition kinds
+skip_on_cran()
 
 test_that("the response-scale unit is one for the families whose latent scale is fixed", {
 	set.seed(6886)

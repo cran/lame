@@ -1,13 +1,13 @@
 # integrate the Poisson-lognormal mass on a local normal scale; log concavity
 # bounds both omitted tails relative to a positive lower bound on the mass
-.lame_pois_marginal_loglik <- function(y_r, eta_obs, ve_s, k_gh = 20L) {
+.lame_pois_marginal_loglik <- function(y_r, eta_obs, ve_s) {
 	if (length(y_r) == 0L) return(numeric(0))
 	if (length(ve_s) != 1L || !is.finite(ve_s) || ve_s <= 0)
 		cli::cli_abort("Poisson marginal log likelihood requires a finite positive observation variance.")
 	if (length(y_r) != length(eta_obs) || any(!is.finite(eta_obs)) ||
 			any(!is.finite(y_r) | y_r < 0 | y_r != floor(y_r)))
 		cli::cli_abort("Poisson log likelihood requires finite predictors and nonnegative integer counts.")
-	# k_gh is ignored: integration runs to a fixed accuracy criterion
+	# integration runs to a fixed accuracy criterion
 	sd_prior <- sqrt(ve_s)
 	t_mode <- (log(y_r + pmax(eta_obs, 0) / ve_s + 1e-8) - eta_obs) / sd_prior
 	converged <- FALSE

@@ -9,9 +9,9 @@
 	caller <- match.arg(caller)
 	reason <- switch(
 		shape,
-		directed = "On simulated directed snap panels the snap ALS fit either tracked the per-period latent product less closely than the {.val ar1} kind (correlation with the generating product 0.72 against 0.80) or, with its drift held at the {.val ar1} kind's smoothing, missed planted resets (both ranked first in 15 of 20 panels against 20 of 20).",
-		bipartite = "On simulated bipartite snap panels the snap ALS fit tracked the per-period latent product less closely than the {.val ar1} kind (correlation with the generating product 0.24 against 0.67).",
-		symmetric = "On simulated symmetric snap panels the snap ALS fit tracked the per-period latent product less closely than the {.val ar1} kind (correlation with the generating product 0.44 against 0.72)."
+		directed = "On directed snap panels a snap ALS fit reads its drift scale from paths the penalty has already shrunk, so it either tracks the latent product less closely than the {.val ar1} kind or misses resets.",
+		bipartite = "On bipartite snap panels a snap ALS fit reads its drift scale from paths the penalty has already shrunk, so it tracks the latent product less closely than the {.val ar1} kind.",
+		symmetric = "On symmetric snap panels a snap ALS fit reads its drift scale from paths the penalty has already shrunk, so it tracks the latent product less closely than the {.val ar1} kind."
 	)
 	use <- if (identical(shape, "directed")) {
 		"Use {.code dynamic_uv_kind = \"snap\"} with {.code method = \"mcmc\"}, or {.code dynamic_uv_kind = \"ar1\"} with {.code method = \"als\"}."

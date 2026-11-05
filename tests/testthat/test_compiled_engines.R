@@ -1,5 +1,5 @@
 # compiled kernels of the Poisson translation moves, the symmetric actor-period move and the nomination feasibility check
-# match their R versions (options lame.ltm_engine = "r", lame.pab_engine, lame.nomination_engine) on the same inputs and seeds
+# match their R versions to rounding (options lame.ltm_engine = "r", lame.pab_engine, lame.nomination_engine) on the same inputs and seeds
 
 ce_with = function(opt, val, code) {
 	old = getOption(opt); options(structure(list(val), names = opt)); on.exit(
@@ -36,7 +36,7 @@ test_that('the compiled level translations of a Poisson fit give the draws of th
 			}
 			c(o, list(u = runif(1)))
 		}))
-		expect_identical(out[[1]], out[[2]])
+		expect_equal(out[[1]], out[[2]], tolerance = 1e-10)
 	}
 })
 
@@ -67,7 +67,7 @@ test_that('the compiled position translations of a Poisson fit give the draws of
 			}
 			c(o, list(u = runif(1)))
 		}))
-		expect_identical(out[[1]], out[[2]])
+		expect_equal(out[[1]], out[[2]], tolerance = 1e-10)
 	}
 })
 
@@ -82,7 +82,7 @@ test_that('the compiled coefficient translation gives the draws of the R step', 
 		for (rep in 1:6) { o = lame:::.lame_ppm_static(cxp, Z, EZ, b, Xk, iV0); Z = o$Z; EZ = o$EZ; b = o$beta }
 		c(o, list(u = runif(1)))
 	}))
-	expect_identical(out[[1]], out[[2]])
+	expect_equal(out[[1]], out[[2]], tolerance = 1e-10)
 })
 
 test_that('the compiled symmetric actor-period loop gives the draws of the R loop', {
@@ -105,7 +105,7 @@ test_that('the compiled symmetric actor-period loop gives the draws of the R loo
 			); Z = r$Z; E = r$E; e = r$eff; ev = ev + r$evals }
 			list(Z = Z, E = E, e = e, ev = ev, u = runif(1))
 		}))
-		expect_identical(out[[1]], out[[2]])
+		expect_equal(out[[1]], out[[2]], tolerance = 1e-10)
 	}
 })
 

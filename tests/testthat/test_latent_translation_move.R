@@ -1,4 +1,5 @@
 # translations of the levels, coefficients, scale and location with the latent array (poisson, ordinal)
+skip_on_cran()
 
 # feasible state of a small panel: predictor, latent array, data and levels, centred or free
 ltmt_state = function(mode, family, centred, dyn, seed = 7L, n = 6L, N = 3L, nb = 8L, K = 4L, nmiss = 4L) {

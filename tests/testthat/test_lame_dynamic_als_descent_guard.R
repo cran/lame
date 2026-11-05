@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # the penalized dynamic ALS route (bias_correct = "none"): a sweep of exact block

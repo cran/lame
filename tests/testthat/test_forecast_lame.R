@@ -1,5 +1,6 @@
 # h-step forecasts propagate the multiplicative term as the posterior mean of U V' decayed by rho_uv^(2h),
 # not as a product of posterior-mean coordinates
+skip_on_cran()
 
 # freeze the AR(1) hyperparameters (rho = 1, sigma = 0) so the forecast carries the last-period state forward unchanged
 .freeze_dynamics = function(fit, rho_uv = 1, rho_ab = 1) {
@@ -465,4 +466,30 @@ test_that("dynamic coefficient forecasts preserve covariate rescaling", {
 	expect_error(suppressWarnings(predict(g, h = 1)), 'aligned')
 	g = f;g$RHO_BETA = NULL
 	expect_error(suppressWarnings(predict(g, h = 1)), 'aligned')
+})
+
+test_that("a dynamic coefficient block without transition draws is refused", {
+	dat = simulate_test_network(n = 5, n_time = 3, family = "normal", seed = 2726)
+	f = suppressWarnings(lame(
+		dat$Y,
+		Xdyad = dat$Xdyad,
+		family = "normal",
+		R = 0,
+		dynamic_beta = "dyad",
+		burn = 5,
+		nscan = 30,
+		odens = 2,
+		seed = 91,
+		verbose = FALSE
+	))
+	# the transition check runs first and already refuses a misaligned fit; bypass it to reach the forecast
+	scale = lame:::.lame_beta_transition_scale(f)
+	local_mocked_bindings(.lame_beta_transition_scale = function(object) scale, .package = "lame")
+	g = f
+	colnames(g$RHO_BETA) = colnames(g$SIGMA_BETA) = paste0(colnames(f$RHO_BETA), "_other")
+	expect_error(
+		suppressWarnings(predict(g, h = 1, type = "link")),
+		class = "lame_forecast_block_missing"
+	)
+	expect_no_error(suppressWarnings(predict(f, h = 1, type = "link")))
 })

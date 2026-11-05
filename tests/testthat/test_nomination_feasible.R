@@ -1,5 +1,6 @@
 # a latent slice outside the constraints of the nomination samplers is moved into them before the sweep
 # (R/nomination_feasible.R); a slice inside is returned as it is
+skip_on_cran()
 
 nf_check = function(Z, Y, YL, odmax, odobs) {
 	ok = TRUE

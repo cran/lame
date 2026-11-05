@@ -3,23 +3,31 @@
 #' @description
 #' Extracts multiplicative latent factor positions (U and V) from a fitted
 #' \code{ame}, \code{lame} or \code{ame_als} model and returns them as a
-#' tidy data frame suitable for plotting and analysis. Optionally applies
-#' Procrustes alignment for dynamic models and includes posterior standard
-#' deviations when posterior samples are available.
+#' tidy data frame suitable for plotting and analysis, with posterior standard
+#' deviations when posterior draws of the positions are available.
 #'
 #' @param object A fitted \code{ame}, \code{lame} or \code{ame_als} model
 #'   object with R > 0.
-#' @param align Logical. For dynamic models (\code{dynamic_uv = TRUE}), apply
-#'   Procrustes alignment across the time periods of this fit to remove
-#'   rotational indeterminacy. Default is \code{FALSE} for \code{ame} objects
-#'   (a single period, so there is nothing to align and the argument has no
-#'   effect) and \code{TRUE} for \code{lame} objects.
+#' @param align Logical. For dynamic \code{ame_als} fits, apply Procrustes
+#'   alignment across the time periods of the fit. It has no effect on
+#'   \code{ame} fits (a single period) or on \code{lame} fits, whose dynamic
+#'   positions are aligned when the model is fitted (see Details).
 #' @param ... Additional arguments (currently unused).
 #'
 #' @details
-#' Alignment only ever happens across the periods of one fit: with
-#' \code{align = TRUE} the fit is passed to \code{\link{procrustes_align}},
-#' which rotates each period onto the one before it. Nothing here aligns two
+#' The latent product of each period is identified, the positions only up to a
+#' rotation or sign change that leaves the product unchanged. The positions of
+#' a \code{lame} fit with \code{dynamic_uv = TRUE} therefore factor the
+#' posterior mean product of every period at the fitted rank: \eqn{U_t V_t'}
+#' with the scale split evenly between \eqn{U_t} and \eqn{V_t};
+#' \eqn{U_t L U_t'} for symmetric fits, with \code{fit$L} fixed across periods;
+#' and \eqn{U_t G V_t'} for bipartite fits, with a diagonal \code{fit$G} fixed
+#' across periods. Each period is matched to the one before by moves that keep
+#' its product. The posterior standard deviations come from the saved draws
+#' (\code{posterior_opts = list(save_UV_draws = TRUE)}), each draw factored the
+#' same way and matched onto the reported positions.
+#'
+#' Alignment only ever happens across the periods of one fit. Nothing here aligns two
 #' different fits (two chains, or the same model with and without a
 #' covariate) to a common orientation, so their latent positions are not
 #' directly comparable. To compare fits that way, stack their \code{U}
@@ -36,9 +44,10 @@
 #'     behaves the same in both cases.}
 #'   \item{value}{Numeric. The posterior mean latent position.}
 #'   \item{posterior_sd}{Numeric. Posterior standard deviation of the latent
-#'     position, or \code{NA} if posterior samples are not available.
-#'     To enable, fit the model with
-#'     \code{posterior_opts = posterior_options(save_UV = TRUE)}.}
+#'     position, or \code{NA} if posterior draws are not available. To enable,
+#'     fit the model with \code{posterior_opts = posterior_options(save_UV = TRUE)}
+#'     (static positions) or \code{posterior_opts = list(save_UV_draws = TRUE)}
+#'     (dynamic positions).}
 #'   \item{type}{Character. \code{"U"} for sender/row positions,
 #'     \code{"V"} for receiver/column positions. Symmetric models have
 #'     only \code{"U"}.}
@@ -79,6 +88,13 @@ latent_positions.ame <- function(object, align = FALSE, ...) {
 #' @export
 latent_positions.lame <- function(object, align = TRUE, ...) {
 	.lame_require_draws(object, "latent_positions")
+	if (isTRUE(object$dynamic_uv)) {
+		# dynamic positions are factored and aligned when the model is fitted
+		if (!identical(object$uv_positions, "posterior_mean_product")) {
+			object <- .lame_dynamic_positions(object)
+		}
+		align <- FALSE
+	}
 	.extract_latent_positions(object, align = align)
 }
 
@@ -131,21 +147,10 @@ latent_positions.ame_als <- function(object, align = FALSE, ...) {
 		G <- aligned$G
 	}
 
-	# posterior sds from stored draws: static fits keep [n, R, S] cubes in
-	# U_samples / V_samples, dynamic fits [n, R, T, S] in U_draws / V_draws.
-	# dynamic sds come from the raw draws, so they include rotational variation
+	# posterior sds: static fits keep [n, R, S] draws in U_samples / V_samples;
+	# dynamic fits carry the sds of the reported coordinates in U_sd / V_sd
 	U_sd <- .compute_posterior_sd(object$U_samples)
 	V_sd <- .compute_posterior_sd(object$V_samples)
-	if (is.null(U_sd) && !is.null(object$U_draws) &&
-			length(dim(object$U_draws)) == 4L) {
-		U_sd <- apply(object$U_draws, c(1, 2, 3), sd, na.rm = TRUE)
-	}
-	if (is.null(V_sd) && !is.null(object$V_draws) &&
-			length(dim(object$V_draws)) == 4L) {
-		V_sd <- apply(object$V_draws, c(1, 2, 3), sd, na.rm = TRUE)
-	}
-	# a dynamic_uv fit always carries per-period posterior sds in fit$U_sd /
-	# fit$V_sd (running sums of squares in the sampler)
 	if (is.null(U_sd) && !is.null(object$U_sd) &&
 			identical(dim(object$U_sd), dim(U))) {
 		U_sd <- object$U_sd
@@ -177,8 +182,12 @@ latent_positions.ame_als <- function(object, align = FALSE, ...) {
 	} else if (nrow(out) > 0L && all(is.na(out$posterior_sd))) {
 		cli::cli_inform(
 			c(
-				"i" = "{.code posterior_sd} is {.val NA} because U/V samples were not saved.",
-				"i" = "To get posterior SDs, refit with {.code posterior_opts = posterior_options(save_UV = TRUE)}."
+				"i" = "{.code posterior_sd} is {.val NA} because U/V draws were not saved.",
+				"i" = if (length(dim(U)) == 3L) {
+					"To get posterior SDs, refit with {.code posterior_opts = list(save_UV_draws = TRUE)}."
+				} else {
+					"To get posterior SDs, refit with {.code posterior_opts = posterior_options(save_UV = TRUE)}."
+				}
 			),
 			.frequency = "once",
 			.frequency_id = "latent_positions_no_sd"

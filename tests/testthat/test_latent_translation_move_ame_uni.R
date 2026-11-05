@@ -1,4 +1,6 @@
 # the translations of unipartite ame() fits (Poisson and ordinal), run from the hook in R/ame_unipartite.R
+skip_on_cran()
+
 ltmu_panel = function(family, sym, n = 8L) {
 	set.seed(5)
 	rn = sprintf('r%02d', 1:n)

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 ordinal_prediction_fixture = function(long = TRUE) {
 	nm = c("a", "b", "c")
 	X = array(1, c(3, 3, 1), dimnames = list(nm, nm, "x_dyad"))

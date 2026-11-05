@@ -298,6 +298,23 @@
 				rho_by_coef <- rep(rs$rho, length(beta_T))
 				sig_by_coef <- rep(rs$sigma, length(beta_T))
 			} else {
+				# every dynamic coefficient needs its block's transition draws
+				dyn_coef <- if (!is.null(object$beta_dynamic_mask)) {
+					object$beta_dynamic_mask
+				} else {
+					rep(TRUE, length(beta_T))
+				}
+				has_draws <- groups %in% names(rs$rho) & groups %in% names(rs$sigma)
+				missing_groups <- unique(groups[dyn_coef & !has_draws])
+				if (length(missing_groups)) {
+					cli::cli_abort(
+						c(
+							"Dynamic coefficient block{?s} {.val {missing_groups}} {?has/have} no transition draws in {.code fit$RHO_BETA} and {.code fit$SIGMA_BETA}.",
+							"i" = "The forecast needs the rho and sigma draws of every dynamic coefficient block."
+						),
+						class = "lame_forecast_block_missing"
+					)
+				}
 				# per-block values broadcast to coefficients by group label
 				rho_by_coef <- ifelse(
 					groups %in% names(rs$rho),

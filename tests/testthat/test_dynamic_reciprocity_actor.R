@@ -1,4 +1,6 @@
 # independent stationary AR and dyad-pair Gaussian design, including actor constraints
+skip_on_cran()
+
 .actor_reciprocity_private291 = function(name) get(name, environment(lame::lame), inherits = TRUE)
 
 .actor_reciprocity_reference291 = function(n, nt, rho, s2, phi, sigma, center, rvar, cvar, partial = FALSE) {

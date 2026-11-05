@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("normal reciprocity refusal uses an exact conservative observed-data certificate", {
 	check = getFromNamespace(".ame_check_normal_reciprocity", "lame")
 	n = 8L

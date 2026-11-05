@@ -220,9 +220,7 @@ init_sigma_beta <- function(group_names, prior = list()) {
 build_beta_state_scales <- function(
 	beta_dyn,
 	XtX_per_t,
-	n_dyads_per_t,
-	g = NULL,
-	beta0_var = 10
+	n_dyads_per_t
 ) {
 	# returns one p_dyn x p_dyn matrix per period
 	dyn_idx <- beta_dyn$dynamic_idx

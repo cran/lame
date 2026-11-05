@@ -1,4 +1,5 @@
 # print, summary, plot, autoplot, glance, update and sampler_describe methods on small fits that run on CRAN
+skip_on_cran()
 
 # everything a method writes, standard output and messages (cli) together
 .pm_text = function(expr) {

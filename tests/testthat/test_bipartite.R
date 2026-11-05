@@ -193,6 +193,37 @@ test_that("bipartite initialization works", {
 	expect_null(init$rho)
 })
 
+test_that("bipartite frn start values follow the nomination ranks", {
+	set.seed(17)
+	nA = 6; nB = 8; Tn = 2
+	Y = array(0, c(nA, nB, Tn))
+	for (t in seq_len(Tn)) for (i in seq_len(nA)) {
+		k = sample(0:3, 1)
+		if (k > 0) Y[i, sample(nB, k), t] = sample(k)
+	}
+	Y[1, 1, 1] = NA
+	init = lame:::init_bipartite_startvals(
+		Y,
+		family = "frn",
+		nA = nA,
+		nB = nB,
+		RA = 1,
+		RB = 1,
+		Tn = Tn,
+		odmax = rep(3, nA)
+	)
+	for (t in seq_len(Tn)) for (i in seq_len(nA)) {
+		y = Y[i, , t]; z = init$Z[i, , t]
+		nom = which(y > 0)
+		# nominated cells are positive, observed non-nominations negative
+		expect_true(all(z[nom] > 0))
+		expect_true(all(z[which(y == 0)] < 0))
+		# a higher rank starts higher
+		if (length(nom) > 1L) expect_identical(order(z[nom]), order(y[nom]))
+	}
+	expect_true(is.finite(init$Z[1, 1, 1]))
+})
+
 # parameter recovery (ame and lame)
 
 test_that("ame() bipartite normal recovers beta and additive effects", {

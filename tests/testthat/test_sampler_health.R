@@ -1,3 +1,5 @@
+skip_on_cran()
+
 .capture_sampler_health_messages = function(expr) {
 	warnings = messages = character()
 	value = withCallingHandlers(

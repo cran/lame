@@ -149,6 +149,10 @@ simulate.lame <- function(
 	}
 
 	fit <- object
+	# dynamic positions factored from the posterior mean products
+	if (isTRUE(fit$dynamic_uv) && !identical(fit$uv_positions, "posterior_mean_product")) {
+		fit <- .lame_dynamic_positions(fit)
+	}
 	family <- if (!is.null(fit$family)) fit$family else "normal"
 	symmetric <- if (!is.null(fit$symmetric)) fit$symmetric else FALSE
 	mode <- if (!is.null(fit$mode)) fit$mode else "unipartite"
@@ -300,18 +304,14 @@ simulate.lame <- function(
 	a_level_fit <- if (!is.null(fit$a_level)) as.numeric(fit$a_level) else if (is.matrix(fit$a_dynamic)) rowMeans(fit$a_dynamic, na.rm = TRUE) else NULL
 	b_level_fit <- if (!is.null(fit$b_level)) as.numeric(fit$b_level) else if (is.matrix(fit$b_dynamic)) rowMeans(fit$b_dynamic, na.rm = TRUE) else NULL
 
-	# innovation sd of the dynamic_uv AR(1): the mean of the fit's sigma_uv draws,
-	# else implied by the spread of the posterior-mean coordinates
-	sigma_uv_innov <- 0.1
-	if (dynamic_uv && !is.null(fit$sigma_uv) && any(is.finite(fit$sigma_uv))) {
-		sigma_uv_innov <- mean(fit$sigma_uv, na.rm = TRUE)
-	} else if (dynamic_uv && !is.null(fit$U) && length(dim(fit$U)) == 3) {
-		marginal_sd <- sd(as.vector(fit$U), na.rm = TRUE)
-		rho_uv_mean <- mean(rho_uv_samples)
-		if (abs(rho_uv_mean) < 1) {
-			sigma_uv_innov <- marginal_sd * sqrt(1 - rho_uv_mean^2)
+	# the dynamic_uv AR(1) keeps the stationary spread of the reported positions
+	u_marginal_sd <- v_marginal_sd <- 0
+	if (dynamic_uv && !is.null(fit$U) && length(dim(fit$U)) == 3) {
+		u_marginal_sd <- stats::sd(as.vector(fit$U), na.rm = TRUE)
+		v_marginal_sd <- if (!is.null(fit[["V"]]) && length(dim(fit[["V"]])) == 3) {
+			stats::sd(as.vector(fit[["V"]]), na.rm = TRUE)
 		} else {
-			sigma_uv_innov <- marginal_sd * 0.1
+			u_marginal_sd
 		}
 	}
 
@@ -436,8 +436,9 @@ simulate.lame <- function(
 						nrow = dim(fit$U)[1],
 						ncol = dim(fit$U)[2]
 					)
-					# posterior-mean coordinates are shrunk; the last period's posterior sd
-					# restores the spread of the start state
+					# absent actors start at the origin; the last period's posterior sd
+					# spreads the start state
+					U_t[!is.finite(U_t)] <- 0
 					if (!is.null(fit$U_sd) && length(dim(fit$U_sd)) == 3 && all(dim(fit$U_sd) == dim(fit$U))) {
 						u_sd <- matrix(fit$U_sd[, , T_fit], nrow(U_t), ncol(U_t))
 						u_sd[!is.finite(u_sd)] <- 0
@@ -454,6 +455,7 @@ simulate.lame <- function(
 							nrow = dim(fit[["V"]])[1],
 							ncol = dim(fit[["V"]])[2]
 						)
+						V_t[!is.finite(V_t)] <- 0
 						# receiver positions use their own posterior sd when stored, else the sender average
 						if (!is.null(fit$V_sd) && length(dim(fit$V_sd)) == 3 && all(dim(fit$V_sd) == dim(fit[["V"]]))) {
 							v_sd <- matrix(fit$V_sd[, , dim(fit[["V"]])[3]], nrow(V_t), ncol(V_t))
@@ -526,11 +528,12 @@ simulate.lame <- function(
 
 			# dynamic multiplicative effects AR(1)
 			if (dynamic_uv && t > 1 && !is.null(U_t)) {
+				innov_scale <- sqrt(max(1 - rho_uv^2, 0))
 				U_t <- rho_uv * U_t + matrix(
 					rnorm(
 						prod(dim(U_t)),
 						0,
-						sigma_uv_innov
+						u_marginal_sd * innov_scale
 					),
 					nrow(U_t),
 					ncol(U_t)
@@ -540,7 +543,7 @@ simulate.lame <- function(
 						rnorm(
 							prod(dim(V_t)),
 							0,
-							sigma_uv_innov
+							v_marginal_sd * innov_scale
 						),
 						nrow(V_t),
 						ncol(V_t)

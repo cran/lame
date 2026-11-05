@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 test_that("the rank-family prior scale is the binary probit-moment scale", {

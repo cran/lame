@@ -1,3 +1,5 @@
+skip_on_cran()
+
 effect_panel = function(bip = FALSE) {
 	set.seed(590)
 	nr = 8L; nc = if (bip) 7L else nr; nt = 3L

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # a cell whose dyadic, sender or receiver covariate is missing in its period is
@@ -408,12 +410,20 @@ test_that("the slope of a bipartite ame() fit is not biased by a missing covaria
 		gof = FALSE,
 		plot = FALSE
 	))
+	fit_complete = fit(x)
+	fit_missing = fit(xm)
 	slope = function(f) mean(f$BETA[, "x_dyad"])
-	complete = slope(fit(x))
-	missing = slope(fit(xm))
+	complete = slope(fit_complete)
+	missing = slope(fit_missing)
 	# dropping the cells keeps the slope near the complete-data fit (true slope 0.7)
 	expect_lt(abs(missing - complete), 0.2)
 	expect_gt(missing, 0.4)
+	# both fits recover the true slope: it lies inside their 95% credible intervals
+	for (f in list(fit_complete, fit_missing)) {
+		ci = quantile(f$BETA[, "x_dyad"], c(0.025, 0.975))
+		expect_gt(0.7, ci[[1]])
+		expect_lt(0.7, ci[[2]])
+	}
 })
 
 test_that("the log-likelihood scoring skips the cells a missing covariate removed", {

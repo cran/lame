@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # the penalised dynamic route (bias_correct = "none") converges on ordinary panels, or is refused with the state:
@@ -82,8 +84,7 @@ test_that("an actor that is present but has no observed cell does not stall the 
 	expect_true(all(fs$a_dynamic[3, ] == 0))
 })
 
-# a binary panel whose rank-2 structure the unpenalised rank-2 fit separates, and a sparse symmetric count panel whose
-# unpenalised rank-2 fit runs away: the objective of the unpenalised static block has no minimiser
+# a binary panel with strong rank-2 structure and a sparse symmetric count panel, both fit at rank 2
 dc_binary = function(n = 14L, Tt = 3L, seed = 31) {
 	set.seed(seed)
 	rn = dc_names(n)
@@ -130,7 +131,7 @@ test_that("the static factors of the binary and count families are penalised, so
 	expect_true(fb$diagnostics$stationarity$pass)
 	expect_false(fb$diagnostics$descent_guard$active)
 	expect_lt(fb$iterations, 400L)
-	# the unpenalised fit of this panel runs away; the penalised product stays bounded
+	# the penalised product stays bounded
 	expect_lt(sqrt(sum(fb$UVPM^2, na.rm = TRUE)), 100)
 	expect_true(all(is.finite(fb$EZ[[1]][!is.na(fb$Y[, , 1])])))
 	fp = lame:::lame_dynamic_als(

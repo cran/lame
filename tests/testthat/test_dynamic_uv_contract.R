@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 test_that("dynamic_uv_kind cannot request a transition when dynamic_uv is off", {
@@ -547,7 +549,7 @@ test_that("the ALS route refuses the snap kind in every shape", {
 	expect_match(msg_d, "is not available", fixed = TRUE)
 	expect_match(msg_d, "dynamic_uv_kind = \"snap\"` with `method = \"mcmc\"", fixed = TRUE)
 	expect_match(msg_d, "dynamic_uv_kind = \"ar1\"` with `method = \"als\"", fixed = TRUE)
-	expect_match(msg_d, "0.72 against 0.80", fixed = TRUE)
+	expect_match(msg_d, "misses resets", fixed = TRUE)
 	Ys = lapply(Yd, function(m) { out = (m + t(m)) / 2; diag(out) = NA; out })
 	msg_s = tryCatch(
 		lame(

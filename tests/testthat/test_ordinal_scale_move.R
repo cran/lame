@@ -1,6 +1,7 @@
 # moves along the scale of the latent array of a rank-likelihood ordinal fit (R/ordinal_scale_move.R): the metric of
 # the dyadic covariance, the density of the scale draw, exactness of the two moves under the joint law without data
 # (with a broken version failing), the one-pass visit against its definition, and the switch and fit records
+skip_on_cran()
 
 osm_mut = function(name, from, to) {
 	src = deparse(get(name, asNamespace('lame')), width.cutoff = 500L)

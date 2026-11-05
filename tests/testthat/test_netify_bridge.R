@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("netify cross-sectional inputs work with ame and ame_als", {
 	skip_if_not_installed("netify", minimum_version = "1.5.3")
 	set.seed(11)

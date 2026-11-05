@@ -283,8 +283,7 @@ combine_ame_chains <- function(chain_list, diagnostics = TRUE) {
 		G_list <- lapply(chain_list, function(x) x[["G"]])
 		.slice2d <- function(A, t) matrix(A[, , t], nrow = dim(A)[1L], ncol = dim(A)[2L])
 		if (u_is_dyn) {
-			combined$U <- weighted_mean(U_list)
-			combined[["V"]] <- weighted_mean(V_list)
+			# positions are refactored from the pooled product below
 			UVPM_list <- lapply(chain_list, `[[`, "UVPM")
 			if (!any(vapply(UVPM_list, is.null, logical(1)))) {
 				combined$UVPM <- weighted_mean(UVPM_list)
@@ -339,14 +338,9 @@ combine_ame_chains <- function(chain_list, diagnostics = TRUE) {
 		ULUPM_list <- lapply(chain_list, function(x) x[["ULUPM"]])
 		if (!any(vapply(ULUPM_list, is.null, logical(1)))) {
 			combined$ULUPM <- weighted_mean(ULUPM_list)
-			# under dynamic_uv the pooled term is per period, so the positions are averaged element-wise
+			# under dynamic_uv the positions are refactored from the pooled product below
 			ulu_is_dyn <- length(dim(ULUPM_list[[1]])) == 3L
-			if (ulu_is_dyn) {
-				U_list_sym <- lapply(chain_list, function(x) x$U)
-				if (!any(vapply(U_list_sym, is.null, logical(1)))) {
-					combined$U <- weighted_mean(U_list_sym)
-				}
-			} else if (!is.null(combined$U)) {
+			if (!ulu_is_dyn && !is.null(combined$U)) {
 				R_lat <- ncol(combined$U)
 				eULU <- eigen(combined$ULUPM)
 				eR <- which(rank(-abs(eULU$val), ties.method = "first") <= R_lat)
@@ -368,7 +362,7 @@ combine_ame_chains <- function(chain_list, diagnostics = TRUE) {
 	}
 
 	# lame fits store YPM and EZ as per-period lists, ame fits as one matrix
-	.avg_maybe_list <- function(items, n) {
+	.avg_maybe_list <- function(items) {
 		if (is.list(items[[1]]) && !is.matrix(items[[1]])) {
 			T_ <- length(items[[1]])
 			lapply(seq_len(T_), function(t) {
@@ -380,13 +374,13 @@ combine_ame_chains <- function(chain_list, diagnostics = TRUE) {
 	}
 	if (!is.null(combined$YPM)) {
 		YPM_list <- lapply(chain_list, function(x) x$YPM)
-		combined$YPM <- .avg_maybe_list(YPM_list, n_chains)
+		combined$YPM <- .avg_maybe_list(YPM_list)
 		if (is.list(combined$YPM)) names(combined$YPM) <- names(YPM_list[[1]])
 	}
 
 	if (!is.null(combined$EZ)) {
 		EZ_list <- lapply(chain_list, function(x) x$EZ)
-		combined$EZ <- .avg_maybe_list(EZ_list, n_chains)
+		combined$EZ <- .avg_maybe_list(EZ_list)
 		if (is.list(combined$EZ)) names(combined$EZ) <- names(EZ_list[[1]])
 	}
 	# Poisson fitted counts at the pooled posterior means of the predictor and residual variance
@@ -416,6 +410,7 @@ combine_ame_chains <- function(chain_list, diagnostics = TRUE) {
 	}
 	# coordinate summaries cannot inherit one chain's uncertainty after pooling
 	combined$U_sd <- combined$V_sd <- NULL
+	combined <- .lame_dynamic_positions(combined)
 	if (!is.null(combined$ALPHA)) combined$alpha_post_mean <- c(0, colMeans(combined$ALPHA))
 	if (!is.null(combined$THETA_ACTOR)) {
 		combined$theta_actor_mean <- apply(combined$THETA_ACTOR, c(2, 3), mean)

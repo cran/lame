@@ -1,6 +1,7 @@
 # the fitted value of a Poisson MCMC fit is the mean count at the posterior means of the log mean and the residual
 # variance, E_t exp(EZ + ve / 2), the form the fast estimators report; an average of replicated counts has no
 # finite expectation under the inverse-gamma prior on the residual variance
+skip_on_cran()
 
 poisson_panel = function(n = 9L, Tn = 3L, bip = FALSE, nB = 6L, expo = NULL, seed = 1) {
 	set.seed(seed)

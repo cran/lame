@@ -109,14 +109,13 @@
 }
 
 #' @noRd
-# per-row GHK with per-dyad attribution. obs_idx is [n_obs x 3] (i, j, t);
-# y_obs holds the observed ranks for frn or 0/1 for cbin. each (i, t) row's
-# log likelihood is split evenly across its observed dyads
+# per-row GHK with per-dyad attribution for frn. obs_idx is [n_obs x 3] (i, j, t);
+# y_obs holds the observed ranks. each (i, t) row's log likelihood is split
+# evenly across its observed dyads
 .ghk_rank_pointwise <- function(
 	y_obs,
 	ez_obs,
 	obs_idx,
-	family,
 	n_mc = 64L,
 	halton_shift = 0,
 	n_bank = 8L,
@@ -136,15 +135,8 @@
 	for (grp in row_groups) {
 		yg <- y_obs[grp]
 		ezg <- ez_obs[grp]
-		# rank permutation, highest rank first
-		if (identical(family, "cbin")) {
-			# cbin: y = 1 dyads come before y = 0 dyads, ties broken by ez
-			ord_1 <- order(-ezg * (yg > 0), -yg)
-			perm <- ord_1
-		} else {
-			# frn: higher rank means larger z; ties ordered by ez
-			perm <- order(-yg, -ezg, na.last = NA)
-		}
+		# rank permutation, highest rank first: higher rank means larger z; ties ordered by ez
+		perm <- order(-yg, -ezg, na.last = NA)
 		# drop NA-rank dyads (frn unobserved past odmax)
 		valid <- which(!is.na(yg[perm]))
 		perm_valid <- perm[valid]
@@ -262,7 +254,6 @@
 			y_obs,
 			ez_obs,
 			obs_idx,
-			family,
 			n_mc = n_mc,
 			halton_shift = halton_shift,
 			n_mc_fixed = n_mc_fixed

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 .per_actor_target_fixture = function(coupled = FALSE) {
 	n = 3L; nt = 3L; rho = .8; variance = .4
 	K = variance / (1 - rho * rho) * rho^abs(outer(1:nt, 1:nt, '-'))

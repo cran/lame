@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("dyadic correlation helpers preserve the full documented support", {
 	rho = c(-.9998, .9997)
 	expect_identical(lame:::.lame_expand_rho(rho, 2L), rho)

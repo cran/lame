@@ -70,7 +70,9 @@ period, then applies it sequentially through the series.
 \details{
 For directed unipartite networks, U and V share one Procrustes rotation per
 period, found from the stacked positions, so the product U V' is unchanged.
-For symmetric networks, only U is present and aligned.
+For symmetric networks the product is \eqn{U L U'} with a diagonal L, which
+only a sign change of a column of U leaves unchanged; each period takes the
+column signs that best match the period before it.
 
 For bipartite networks, one G serves every period, so a period's product
 \code{U \%*\% G \%*\% t(V)} is unchanged only by transformations

@@ -107,14 +107,13 @@ log_phi_diff <- function(hi, lo, width = NULL) {
 # Z-marginalised ordinal log-likelihood at cutpoints alpha,
 # sum log{pnorm(alpha_y - eta) - pnorm(alpha_{y-1} - eta)}; `alpha_full` is
 # c(-Inf, alpha, Inf), and the symmetric caller already counts each dyad once
-.ord_marginal_loglik <- function(alpha_full, eta_obs, Y_int_obs, symmetric) {
-	scale <- 1
+.ord_marginal_loglik <- function(alpha_full, eta_obs, Y_int_obs) {
 	hi <- alpha_full[Y_int_obs + 1L]
 	lo <- alpha_full[Y_int_obs]
 	log_p <- log_phi_diff(
-		scale * (hi - eta_obs),
-		scale * (lo - eta_obs),
-		width = scale * (hi - lo)
+		hi - eta_obs,
+		lo - eta_obs,
+		width = hi - lo
 	)
 	sum(log_p)
 }
@@ -172,12 +171,11 @@ sample_alpha_cowles <- function(alpha, Y_int, EZ, tau_prop, symmetric = FALSE) {
 	delta_prop <- delta + tau_prop * stats::rnorm(length(delta))
 	alpha_prop <- .delta_to_alpha(delta_prop)
 
-	K <- K_minus_1 + 1L # number of categories
 	af_curr <- c(-Inf, alpha, Inf)
 	af_prop <- c(-Inf, alpha_prop, Inf)
 
-	ll_curr <- .ord_marginal_loglik(af_curr, EZ_obs, Y_obs, symmetric)
-	ll_prop <- .ord_marginal_loglik(af_prop, EZ_obs, Y_obs, symmetric)
+	ll_curr <- .ord_marginal_loglik(af_curr, EZ_obs, Y_obs)
+	ll_prop <- .ord_marginal_loglik(af_prop, EZ_obs, Y_obs)
 
 	# log Jacobian of delta -> alpha; the prior on ordered alpha is flat and the proposal
 	# is symmetric in delta

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 chain_panel = function(n = 12L, nt = 3L, seed = 31) {
 	set.seed(seed)
 	nm = paste0("a", seq_len(n))

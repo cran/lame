@@ -1,5 +1,6 @@
 # translations of the dynamic_beta coefficients of a Poisson fit with the latent array, and the dyadic variance and
 # correlation moved with the residuals carried along their conditional law (R/poisson_period_move.R)
+skip_on_cran()
 
 # a copy of the function `name` of the package with the text `from` replaced by `to` (one pair or several, applied in turn), on the lines of
 # its deparsed source that contain `only` and not `skip`

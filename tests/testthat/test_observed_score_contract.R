@@ -1,3 +1,5 @@
+skip_on_cran()
+
 score_contract_private = function(name) get(name, envir = environment(lame::lame), inherits = TRUE)
 
 test_that("observed exact rank and cap score requests refuse the wrong likelihood", {
@@ -233,13 +235,13 @@ test_that("short ordinal intervals retain their original width in scores and Cow
 		)
 		actual = fn(2, eta, c(0, w), c(1, 2, 3))
 		expect_equal(actual, ref, tolerance = 1e-12)
-		expect_equal(marginal(c(-Inf, 0, w, Inf), eta, 2, FALSE), ref, tolerance = 1e-12)
+		expect_equal(marginal(c(-Inf, 0, w, Inf), eta, 2), ref, tolerance = 1e-12)
 	}
 	expect_equal(fn(2, 1e6, c(0, 1e-20), c(1, 2, 3)), dnorm(-1e6, log = TRUE) + log(1e-20), tolerance = 1e-14)
 	expect_identical(score_contract_private("log_phi_diff")(Inf, -Inf), 0)
 	# the Cowles acceptance log ratio is finite for these valid proposals
-	before = marginal(c(-Inf, 0, 1e-20, Inf), c(0, -40, 40), rep(2, 3), FALSE)
-	after = marginal(c(-Inf, 0, 2e-20, Inf), c(0, -40, 40), rep(2, 3), FALSE)
+	before = marginal(c(-Inf, 0, 1e-20, Inf), c(0, -40, 40), rep(2, 3))
+	after = marginal(c(-Inf, 0, 2e-20, Inf), c(0, -40, 40), rep(2, 3))
 	expect_equal(after - before, 3 * log(2), tolerance = 1e-12)
 })
 

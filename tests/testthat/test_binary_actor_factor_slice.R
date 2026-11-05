@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that('marginal actor-factor blocks preserve the independently evaluated posterior', {
 	skip_on_cran()
 	bvn = .lame_binary_dynamic_bvn_log

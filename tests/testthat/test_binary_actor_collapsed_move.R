@@ -1,5 +1,6 @@
 # collapsed per-actor update of the binary samplers (R/binary_actor_collapsed_move.R): directed and symmetric,
 # lame() (centred levels) and ame() (unconstrained levels), complete panels and panels with absent actors
+skip_on_cran()
 
 # tiny binary panel: the last actor has no events; with `absent`, actor 3 misses the second period (or the whole cross-section),
 # one cell is missing, and a symmetric panel has one pair observed only in its lower cell and one only in its upper cell

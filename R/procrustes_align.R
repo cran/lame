@@ -48,7 +48,9 @@
 #' @details
 #' For directed unipartite networks, U and V share one Procrustes rotation per
 #' period, found from the stacked positions, so the product U V' is unchanged.
-#' For symmetric networks, only U is present and aligned.
+#' For symmetric networks the product is \eqn{U L U'} with a diagonal L, which
+#' only a sign change of a column of U leaves unchanged; each period takes the
+#' column signs that best match the period before it.
 #'
 #' For bipartite networks, one G serves every period, so a period's product
 #' \code{U \%*\% G \%*\% t(V)} is unchanged only by transformations
@@ -138,6 +140,8 @@ procrustes_align <- function(
 					)
 					U_aligned[, , , s] <- a$U
 					V_aligned[, , , s] <- a[["V"]]
+				} else if (isTRUE(object$symmetric)) {
+					U_aligned[, , , s] <- align_over_time_sym(array(U_full[, , , s], dim(U_full)[1:3]))
 				} else {
 					a <- procrustes_align(NULL, U = U_full[, , , s])
 					U_aligned[, , , s] <- a$U
@@ -206,6 +210,9 @@ procrustes_align <- function(
 			pair <- align_over_time_unip_pair(U, V)
 			U_al <- pair$U
 			V_al <- pair[["V"]]
+		} else if (!is.null(object) && isTRUE(object$symmetric)) {
+			U_al <- align_over_time_sym(U)
+			V_al <- V
 		} else {
 			U_al <- align_over_time_unip(U)
 			V_al <- V

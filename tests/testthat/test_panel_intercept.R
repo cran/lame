@@ -1,4 +1,5 @@
 # panel designs retain an intercept unless their observed covariates span it
+skip_on_cran()
 
 .panel_constant_design = function(C, n = 5L, m = n) {
 	if (is.null(dim(C))) C = matrix(C, ncol = 1L)

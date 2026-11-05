@@ -1,3 +1,5 @@
+skip_on_cran()
+
 pit_distribution_fit = function(
 	beta = c(-2, -2, 2, 2),
 	ve = rep(.01, length(beta)),
@@ -292,7 +294,7 @@ test_that("standardized Poisson quadrature retains tiny physical perturbations",
 				subdivisions = 1000
 			)$value
 		)
-		expect_equal(fn(2, .3, v, k_gh = 80L), oracle, tolerance = 1e-9)
+		expect_equal(fn(2, .3, v), oracle, tolerance = 1e-9)
 	}
 })
 

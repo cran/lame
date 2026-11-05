@@ -1,3 +1,5 @@
+skip_on_cran()
+
 robust_fixture = function(seed = 741L, rank = 2L, df = 4, burn = 20, nscan = 80, odens = 2) {
 	set.seed(14821)
 	actors = LETTERS[1:5]

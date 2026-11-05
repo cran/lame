@@ -54,6 +54,7 @@
 
 # invert a working log1p response; aborts only if the count mean overflows
 .poisson_inverse_log1p <- function(eta) {
+	# called for its overflow check only; the returned rate is not used
 	.als_pois_rate(eta)
 	pmax(expm1(eta), 0)
 }

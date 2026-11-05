@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("observed binary scores retain both probit tails and infinity limits", {
 	y = rep(c(0, 1), each = 5)
 	eta = rep(c(-40, -10, 0, 10, 40), 2)

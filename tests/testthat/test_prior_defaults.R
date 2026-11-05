@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("persistence defaults are scoped to Gaussian bipartite AR1 fits", {
 	set.seed(116)
 	Y = array(

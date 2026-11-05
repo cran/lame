@@ -122,6 +122,11 @@ uv_plot <- function(
 				class = "lame_product_withheld"
 			)
 		}
+		# dynamic positions factored from the posterior mean products
+		if (inherits(fit, "lame") && isTRUE(fit$dynamic_uv) &&
+				!identical(fit$uv_positions, "posterior_mean_product")) {
+			fit <- .lame_dynamic_positions(fit)
+		}
 		if (is.null(U)) U <- fit$U
 		if (is.null(V)) V <- fit[["V"]]
 		# symmetric fits store U and L only; plot one latent space with V = U

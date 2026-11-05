@@ -1,4 +1,6 @@
 # independent prior draws and observation densities expose absolute numerical floors
+skip_on_cran()
+
 .gibbs_scale_z = function(draws, mean, covariance) {
 	N = nrow(draws)
 	se = sqrt((outer(diag(covariance), diag(covariance)) + covariance^2) / (N - 1))

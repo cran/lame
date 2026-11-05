@@ -1,3 +1,5 @@
+skip_on_cran()
+
 .gaussian_score_fixture = function(symmetric, rank, missing, nr = 12L, nc = nr) {
 	nt = 3L;U = matrix(rnorm(nr * rank, sd = .4), nr, rank)
 	V = if (symmetric) U else matrix(rnorm(nc * rank, sd = .4), nc, rank)

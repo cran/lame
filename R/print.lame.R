@@ -204,10 +204,10 @@ print.lame <- function(x, compact = TRUE, digits = 3, ...) {
 				cli::cli_verbatim(utils::capture.output(print(tbl, row.names = FALSE)))
 				cli::cli_alert_info("{.field sigma_innov} columns are AR(1) innovation SDs (not marginal/stationary SDs).")
 				if (uv_unident) {
-					cli::cli_alert_info("{.code rho_uv} / {.code sigma_uv} are not reported for {.code dynamic_uv_kind = {.val {x$dynamic_uv_kind %||% \"snap\"}}} at rank two or more: on simulated panels the chains settled where large jumps stand in for drift and did not recover them (draws in {.code fit$rho_uv}, {.code fit$sigma_uv}).")
+					cli::cli_alert_info("{.code rho_uv} / {.code sigma_uv} are not reported for {.code dynamic_uv_kind = {.val {x$dynamic_uv_kind %||% \"snap\"}}} at rank two or more (draws in {.code fit$rho_uv}, {.code fit$sigma_uv}).")
 				}
 				if (.lame_snap_rate_unidentified(x)) {
-					cli::cli_alert_info("The reset rate {.code pi_snap} is not reported at rank two or more: on simulated panels extra resets stood in for drift and its draws overstated it (draws in {.code fit$pi_snap}).")
+					cli::cli_alert_info("The reset rate {.code pi_snap} is not reported at rank two or more (draws in {.code fit$pi_snap}).")
 				}
 				if (pi_snap_shown) {
 					pi_txt <- .qfmt(x$pi_snap)

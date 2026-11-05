@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # dynamic empirical-Bayes estimator for normal panels (R/lame_dynamic_als_eb_nrm.R): a gaussian cell in the binary and

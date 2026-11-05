@@ -11,12 +11,19 @@
 using namespace Rcpp;
 using namespace arma;
 
+// a precision whose diagonally scaled inverse reaches 0.01 / eps leaves under
+// two digits to resolve it, and whether its inversion succeeds depends on rounding
+static bool resolved_inverse_uv(const arma::mat& A, const arma::mat& inverse) {
+  return inverse.is_finite() &&
+    arma::max(inverse.diag() % A.diag()) * 100.0 * arma::datum::eps < 1.0;
+}
+
 // Preserve the supplied Gaussian precision. A diagonally scaled solve can
 // improve its conditioning; adding a ridge would instead change the target.
 static bool safe_inv_sympd_uv(const arma::mat& M, arma::mat& out) {
   arma::mat A = 0.5 * (M + M.t());
   if (!A.is_finite()) return false;
-  if (arma::inv_sympd(out, A) && out.is_finite()) return true;
+  if (arma::inv_sympd(out, A) && out.is_finite()) return resolved_inverse_uv(A, out);
   arma::vec diagonal = A.diag();
   if (arma::any(diagonal <= 0.0)) return false;
   arma::vec scale = 1.0 / arma::sqrt(diagonal);
@@ -28,7 +35,7 @@ static bool safe_inv_sympd_uv(const arma::mat& M, arma::mat& out) {
   inverse.each_col() %= scale;
   inverse.each_row() %= scale.t();
   out = inverse;
-  return out.is_finite();
+  return resolved_inverse_uv(A, out);
 }
 
 // Gauge-fixing rotation applied identically to every time slice. A single

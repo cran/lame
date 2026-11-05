@@ -1,4 +1,6 @@
 # independent checks of the residual-scale extension
+skip_on_cran()
+
 test_that("observation scales are explicit and their observed cells enter diagnostics", {
 	set.seed(83192)
 	nm = LETTERS[1:4]

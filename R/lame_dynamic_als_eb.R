@@ -2316,8 +2316,6 @@
 		sigma_ab = if (no_ab) NULL else sigma_ab,
 		rho_beta = if (lay$any) stats::setNames(hb$rho, lay$groups) else NULL,
 		sigma_beta = if (lay$any) stats::setNames(sqrt(hb$s2), lay$groups) else NULL,
-		lambda_u = NULL,
-		lambda_v = NULL,
 		lambda_uv_als = NULL,
 		lambda_ab_als = NULL,
 		lambda_beta_als = NULL,

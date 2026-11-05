@@ -12,7 +12,7 @@ test_that("explicit ordinal Gaussian truncation retains positive tail probabilit
 			pnorm(41, lower.tail = FALSE, log.p = TRUE))
 	expect_lt(abs(mean(u1) - .5), 5 / sqrt(12 * ncol(x)))
 	expect_lt(abs(mean(u3) - .5), 5 / sqrt(12 * ncol(x)))
-	expect_identical(lame:::.ord_marginal_loglik(c(-Inf, 0, 0, Inf), 0, 2, FALSE), -Inf)
+	expect_identical(lame:::.ord_marginal_loglik(c(-Inf, 0, 0, Inf), 0, 2), -Inf)
 })
 
 test_that("symmetric array cutpoints count each unordered pair at its averaged predictor", {

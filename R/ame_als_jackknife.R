@@ -383,7 +383,7 @@
 			base,
 			list(
 				problem = sprintf(
-					"a single cross-section with a multiplicative term (R = %d) cannot carry the correction: split by the checkerboard of the cells, on simulated directed networks at R = 2 it over-corrected wherever the uncorrected estimate needs a correction (100 actors: slope 1.024 to 0.971, vb 1.090 to 0.950 of the truth; 50 actors: slope 1.059 to 0.901, va 1.209 to 0.791), and a random split did the same",
+					"a single cross-section with a multiplicative term (R = %d) cannot carry the correction: neither a checkerboard nor a random split of its cells corrects the fit without over-correcting it",
 					R
 				),
 				hint = "The correction needs a panel with five or more periods when R > 0.",
@@ -396,7 +396,7 @@
 			base,
 			list(
 				problem = sprintf(
-					"with a multiplicative term (R = %d) and %d periods each dyad keeps one or two periods in a half sample, too few for its product cell, and on simulated 30-actor panels at R = 2 the correction over-corrected va (4 periods: 1.03 to 0.90; 3: 1.01 to 0.81; 2: 1.07 to 0.75 of the truth)",
+					"with a multiplicative term (R = %d) and %d periods each dyad keeps one or two periods in a half sample, too few for its product cell, so the correction over-corrects",
 					R,
 					d[3L]
 				),
@@ -415,7 +415,7 @@
 				base,
 				list(
 					problem = sprintf(
-						"a panel of %.1f rarer-outcome cells per actor is below the %.0f from which the correction holds at R = 0; on simulated directed panels of 20 actors it over-corrected va to 0.75 and vb to 0.87 of the truth at two periods (14 cells per actor) and va to 0.93 at three (21)",
+						"a panel of %.1f rarer-outcome cells per actor is below the %.0f from which the correction holds at R = 0",
 						size,
 						jk_floor
 					),
@@ -597,7 +597,7 @@
 			base,
 			list(
 				problem = sprintf(
-					"a single cross-section of %.1f rarer-outcome cells per actor is below the %.0f from which its checkerboard correction holds; on simulated directed networks of 50 actors (18 cells per actor) it over-corrected va from 1.01 to 0.86 and vb from 1.06 to 0.89 of the truth",
+					"a single cross-section of %.1f rarer-outcome cells per actor is below the %.0f from which its checkerboard correction holds",
 					size,
 					floor_cs
 				),

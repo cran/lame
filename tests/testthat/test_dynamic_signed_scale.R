@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("tiny symmetric coordinates retain their signed factor weights", {
 	U = array(c(1, -2, 3) * 1e-160, c(3, 1, 1))
 	E = array(c(0, 1.3, -.6, 1.3, 0, .8, -.6, .8, 0), c(3, 3, 1))

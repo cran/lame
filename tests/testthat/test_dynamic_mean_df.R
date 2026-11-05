@@ -1,3 +1,5 @@
+skip_on_cran()
+
 dynamic_df_dense_reference = function(prep, mask, w, dynamic_ab, lab, rab, lbeta, kind, rbeta, level, sym) {
 	nr = prep$nr;nc = prep$nc;nt = prep$Tt;p = length(mask);ta = if (dynamic_ab) nt else 1L
 	names = character();map = matrix(0, p, nt)

@@ -215,7 +215,7 @@
 		cli::cli_abort(
 			c(
 				"Binary ALS cannot correct this undirected network with {.code R = {object$R}}.",
-				"x" = "The split-sample correction does not reach it and the bootstrap bias correction does not hold for undirected fits with a multiplicative term: on simulated undirected 50-actor networks with a rank-1 term of variance 1 the fitted product was 0.68 of the generating one and the correction moved the dyadic slope from 1.0% above to 5.8% below the truth; with a rank-1 term of variance 0.36 the factor penalty removed the product in every fit and the slope went from 6.5% to 12.6% below the truth.",
+				"x" = "The split-sample correction does not reach it and the bootstrap bias correction does not hold for undirected fits with a multiplicative term: the replicates do not reproduce how far the fitted product is flattened, so the correction moves the dyadic slope away from the truth.",
 				"i" = "Use the default empirical-Bayes estimator, {.fn ame} / {.fn lame} (MCMC), {.code R = 0} (corrected by the bootstrap), a panel of five or more periods (split-sample correction), or {.code bias_correct = \"none\"} for the uncorrected ALS estimate."
 			),
 			class = "lame_als_size"

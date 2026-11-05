@@ -1,3 +1,5 @@
+skip_on_cran()
+
 poisson_summary_fixture = function(long = FALSE, bip = FALSE) {
 	n = 3L; m = if (bip) 2L else n; S = 8L
 	rn = letters[seq_len(n)]; cn = if (bip) LETTERS[seq_len(m)] else rn

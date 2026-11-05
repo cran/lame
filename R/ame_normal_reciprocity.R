@@ -30,30 +30,7 @@
 	n <- nrow(Y)
 	# a dense asymmetric pair set fits neither the refusal nor the forest safeguard
 	if (!all_equal && m > n - 1L) return(invisible(NULL))
-	# exact union-find with path compression and size weighting (no rank tolerance)
-	parent_node <- seq_len(n)
-	tree_size <- rep.int(1L, n)
-	component_count <- n
-	find_root <- function(actor) {
-		while (parent_node[actor] != actor) {
-			parent_node[actor] <<- parent_node[parent_node[actor]]
-			actor <- parent_node[actor]
-		}
-		actor
-	}
-	for (k in seq_len(m)) {
-		left <- find_root(pairs[k, 1L])
-		right <- find_root(pairs[k, 2L])
-		if (left == right) next
-		if (tree_size[left] < tree_size[right]) {
-			temporary <- left
-			left <- right
-			right <- temporary
-		}
-		parent_node[right] <- left
-		tree_size[left] <- tree_size[left] + tree_size[right]
-		component_count <- component_count - 1L
-	}
+	component_count <- .lame_pair_components(pairs, n)
 	actor_bound <- if (isTRUE(rvar) || isTRUE(cvar)) n - component_count else 0L
 	p <- dim(X)[3L]
 	asymmetric_columns <- if (p == 0L) 0L else sum(vapply(seq_len(p), function(k) {

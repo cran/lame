@@ -1,5 +1,6 @@
 # the symmetric node tie composed with the scale moves of the binary and ordinal families: one step of the move on a tied state
 # leaves the joint law of the tied coefficients, the effects, the latent array and the ties unchanged
+skip_on_cran()
 
 # tie_geweke: states are drawn from the prior of the tied model (the dyadic coefficient, the pair of a nodal covariate as the mean of a draw
 # of the pair, static additive effects, an unscaled part m standing for dynamic effects), the latent array around the predictor, and the ties

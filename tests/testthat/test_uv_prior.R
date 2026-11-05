@@ -1,5 +1,6 @@
 # the prior of the multiplicative effects of a unipartite network: one definition (R/uv_prior.R) that ame(), lame(),
 # the exact moves and the empirical-Bayes estimators read
+skip_on_cran()
 
 test_that("the degrees of freedom are the smallest for which the prior has a finite mean", {
 	for (R in 1:6) {

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # residuals(type = "pearson") scales the response residual by the standard

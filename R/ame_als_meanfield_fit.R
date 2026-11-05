@@ -405,7 +405,7 @@
 		eb_vcov = list(evidence = mode_evidence)
 	)
 	ir <- list(fit = fit0, W = object$obs_weights)
-	# the variational iteration may need more steps on new data than the default refit budget
+	# the refits run at least 50 iterations: the variational iteration may need more steps on new data
 	vb <- .ae_mf_refine(
 		prep,
 		ir,

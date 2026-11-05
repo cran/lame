@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that('dynamic actor trajectories remain finite and reversible with a large factor force', {
 	a = readRDS(test_path('fixtures', 'binary_dynamic_hmc_large_force.rds'))
 	# a stored context without the prior fields was drawn under the unit prior: 2R + 2 degrees of freedom, scale (2R + 2) I

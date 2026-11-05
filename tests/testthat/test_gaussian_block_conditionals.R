@@ -1,4 +1,5 @@
 # the coefficient/additive-effect block and the factor columns against independent dense conditionals built cell by cell
+skip_on_cran()
 
 # dense conditional of (beta, a, b): each unordered pair is bivariate with covariance s2 [1 rho; rho 1], each diagonal cell
 # has variance s2 (1 + rho), (a_i, b_i) ~ N(0, Sab), beta ~ N(m0, P0^-1); centering makes both actor margins sum to zero

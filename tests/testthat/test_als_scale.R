@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # scale of the factor prior in the variational binary ALS fit: the cavity weight of a cell, the cavity covariances

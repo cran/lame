@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that('symmetric saved effects retain actor names and their shared draws', {
 	set.seed(517);nm = paste0('n', 1:8)
 	Y = lapply(1:3, function(t) {m = matrix(rnorm(64), 8);m = (m + t(m)) / 2;diag(m) = NA;dimnames(m) = list(nm, nm);m})

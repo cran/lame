@@ -1,4 +1,5 @@
 # generics defined for a fit class only to refuse, and nobs() of a fast fit; run on CRAN
+skip_on_cran()
 
 test_that("formula() and logLik() refuse an MCMC lame fit with the reason", {
 	fit = structure(list(), class = "lame")

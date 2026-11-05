@@ -430,9 +430,7 @@ print.summary.lame <- function(x, digits = 3, ...) {
 			if (isTRUE(x$uv_hyper_unidentified)) {
 				cli::cli_bullets(c(
 					" " = paste0(
-						"rho_uv and sigma_uv are not reported for this transition kind at rank two or more: ",
-						"on simulated panels the chains settled where large jumps stand in for drift and did not recover them; ",
-						"the positions and the stationary spread of their paths were recovered ",
+						"rho_uv and sigma_uv are not reported for this transition kind at rank two or more ",
 						"(the draws are in {.code fit$rho_uv} and {.code fit$sigma_uv})."
 					)
 				))
@@ -440,8 +438,8 @@ print.summary.lame <- function(x, digits = 3, ...) {
 			if (isTRUE(x$pi_snap_unidentified)) {
 				cli::cli_bullets(c(
 					" " = paste0(
-						"The reset rate pi_snap is not reported at rank two or more: on simulated panels extra resets ",
-						"stood in for drift and its draws overstated it (the draws are in {.code fit$pi_snap})."
+						"The reset rate pi_snap is not reported at rank two or more ",
+						"(the draws are in {.code fit$pi_snap})."
 					)
 				))
 			}

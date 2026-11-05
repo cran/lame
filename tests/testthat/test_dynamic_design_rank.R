@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # the dynamic ALS estimators (empirical-Bayes for the three families, and penalised with bias_correct = "none") refuse an

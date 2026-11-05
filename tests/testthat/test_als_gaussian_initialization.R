@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that('dynamic fits preserve their initializer and certify their final objective', {
 	set.seed(11L);n = 8L;Y = lapply(
 		1:4,

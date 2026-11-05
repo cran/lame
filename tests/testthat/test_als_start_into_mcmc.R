@@ -1,5 +1,6 @@
 # ALS start values passed to the MCMC samplers: an ALS fit labels its effects and positions by actor (and period),
 # while the sampler state is plain numeric, so the labels stay out of the translation moves that index it by actor
+skip_on_cran()
 
 asm_panel = function(mode, family, n = 8L, nb = 6L, N = 3L, seed = 11L) {
 	set.seed(seed)

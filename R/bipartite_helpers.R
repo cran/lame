@@ -68,12 +68,16 @@ init_bipartite_startvals <- function(
 			slice[neg] <- -abs(slice[neg])
 			Z[, , t] <- slice
 		} else if (family == "frn") {
-			# nominated cells start positive; the rest are standard normal
+			# nominated cells start positive in rank order, observed non-nominations negative,
+			# missing cells standard normal
 			slice <- matrix(stats::rnorm(nA * nB), nA, nB)
 			for (i in seq_len(nA)) {
-				if (any(Yt[i, ] > 0, na.rm = TRUE)) {
-					ranked <- which(Yt[i, ] > 0)
-					slice[i, ranked] <- sort(
+				not_nominated <- which(Yt[i, ] == 0)
+				slice[i, not_nominated] <- -abs(slice[i, not_nominated])
+				ranked <- which(Yt[i, ] > 0)
+				if (length(ranked)) {
+					by_rank <- ranked[order(Yt[i, ranked], decreasing = TRUE)]
+					slice[i, by_rank] <- sort(
 						abs(stats::rnorm(length(ranked))),
 						decreasing = TRUE
 					)

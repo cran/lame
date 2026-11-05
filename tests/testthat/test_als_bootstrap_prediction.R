@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("bootstrap response generation retains means above one million", {
 	draw = get('.ae_boot_draw_response', asNamespace('lame'))
 	f = list(family = 'poisson', mode = 'bipartite', link = 'log')

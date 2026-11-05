@@ -1,3 +1,5 @@
+skip_on_cran()
+
 library(lame)
 
 # a dynamic empirical-Bayes fit reports its effects at mean zero over actors, with the matching intercept

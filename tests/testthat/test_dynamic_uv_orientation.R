@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("circular conditional draws match independent Bessel moments", {
 	skip_on_cran()
 	set.seed(641177)

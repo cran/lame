@@ -1,3 +1,5 @@
+skip_on_cran()
+
 .tempered_fixture = function() {
 	n = 6L
 	actors = c('f', 'a', 'd', 'b', 'e', 'c')

@@ -1,5 +1,6 @@
 # symmetric ordinal in ame(): the path runs, returns a symmetric YPM, recovers a dyadic-covariate sign, and uses
 # variance 1 (each unordered dyad once) so the dyadic coefficients are not attenuated
+skip_on_cran()
 
 skip_if_too_slow = function() {
 	if (identical(Sys.getenv("LAME_FAST_TESTS"), "1")) skip("LAME_FAST_TESTS = 1")

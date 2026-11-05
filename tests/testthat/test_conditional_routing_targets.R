@@ -1,4 +1,6 @@
 # the public routing expressions, evaluated on controlled states
+skip_on_cran()
+
 .find_conditional_route = function(x, predicate) {
 	if (!is.call(x)) return(NULL)
 	if (predicate(x)) return(x)

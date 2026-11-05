@@ -1,6 +1,7 @@
 # ab_plot(effect = "both") for ame / lame fits: sender and receiver effects
 # as two panels, each sorted on its own; fake fit objects keep this fast, and one
 # real fit at the end checks the object layout
+skip_on_cran()
 
 fake_static = function(a, b, mode = "unipartite", cls = "ame") {
 	fit = list(APM = a, BPM = b, mode = mode)

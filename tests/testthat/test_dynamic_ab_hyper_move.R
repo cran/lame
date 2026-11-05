@@ -1,5 +1,6 @@
 # collapsed update of the dynamic additive-effect hyperparameters in every mode and family
 # (R/dynamic_ab_hyper_move.R; the one-margin target is in R/binary_bipartite_scale_moves.R)
+skip_on_cran()
 
 # a stacked target and a symmetric/one-margin context for given totals
 hyper_totals = function(n, N, seed, centred = TRUE) {

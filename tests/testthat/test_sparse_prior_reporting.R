@@ -57,7 +57,7 @@ test_that("the reporting rules read the measured rates", {
 	st = lame:::.lame_ab_statements(modifyList(f, list(events_per_actor_period = 0.5)))
 	expect_length(st, 2L)
 	expect_match(st[1], "va and vb are not estimated")
-	expect_match(st[1], "covered")
+	expect_match(st[1], "too few for their intervals")
 	expect_false(grepl("conservative|pending|sensitiv", paste(st, collapse = " ")))
 })
 
@@ -199,7 +199,7 @@ test_that("a one-period saturated cap withholds the intercept and reports va, vb
 	expect_false(any(is.na(confint(f, parm = "va"))))
 	td = tidy(f)
 	expect_true(is.na(td$estimate[td$term == "intercept"]))
-	expect_match(.flat(capture.output(print(s))), "covered 0.64")
+	expect_match(.flat(capture.output(print(s))), "nothing bounds the level of a row above")
 	expect_match(.printed(f), "not estimated")
 })
 

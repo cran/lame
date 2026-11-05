@@ -317,8 +317,8 @@ test_that("as_draws flattens 3-D BETA to draws_array", {
 	)
 	d = as_draws(fit)
 	expect_s3_class(d, "draws_array")
-	# 2 coefficients x 3 periods plus the variance components
-	expect_true(dim(d)[3] >= 6L)
+	# 2 coefficients x 3 periods plus the five variance components (va, cab, vb, rho, ve)
+	expect_equal(dim(d)[3], 11L)
 	vn = dimnames(d)[[3]]
 	expect_true(any(grepl("\\[t1\\]", vn)))
 })

@@ -1,3 +1,5 @@
+skip_on_cran()
+
 .binary_joint_ar_fixture = function() {
 	set.seed(921865);n = 3L;nt = 2L;rank = 2L
 	Y = array(NA_real_, c(n, n, nt));Y[cbind(

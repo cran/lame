@@ -188,11 +188,11 @@ factors and carry the uncertainty of that scale
 factors). The transition model is selected by \code{dynamic_uv_kind}.
 A directed fit with dynamic positions carries the dyadic correlation of
 \code{dcor} through the position kernel (see \code{dcor}).
-\code{fit$U} / \code{fit$V} store only the posterior-mean trajectory cubes;
-draw-level trajectory uncertainty requires refitting with
-\code{posterior_opts = list(save_UV_draws = TRUE)}, which attaches the
-per-iteration cubes as \code{fit$U_draws} / \code{fit$V_draws}. Default
-\code{FALSE}.
+\code{fit$U} / \code{fit$V} hold the positions factored from each period's
+posterior mean product (see \code{\link{latent_positions}}); the per-iteration
+cubes are kept as \code{fit$U_draws} / \code{fit$V_draws} by the default
+\code{posterior_opts} (or with \code{posterior_opts = list(save_UV_draws =
+TRUE)}), and give the posterior standard deviations. Default \code{FALSE}.
 With \code{method = "als"} and a normal, binary or Poisson outcome the positions are
 estimated by the dynamic empirical-Bayes estimator (see
 \code{bias_correct}): \code{fit$U} and \code{fit$V} are the posterior means
@@ -1489,20 +1489,23 @@ one period; \code{odmax_sat_threshold} records the one applied)
 mean of additive column effects b}
 \item{APM_sd, BPM_sd}{posterior standard deviation of each additive effect
 (static effects), used by \code{simulate()} to draw the effects}
-\item{U}{posterior mean of multiplicative
-row effects u. For dynamic_uv=TRUE, this is a 3D array (n x R x T)}
-\item{V}{posterior mean of multiplicative column effects v (asymmetric case).
-For dynamic_uv=TRUE, this is a 3D array (n x R x T)}
-\item{U_sd, V_sd}{for \code{dynamic_uv = TRUE}, the per-period posterior
-standard deviation of each latent coordinate, same shape as \code{U} and
-\code{V}; \code{latent_positions()} reports them as \code{posterior_sd}}
+\item{U}{multiplicative row effects u. For \code{dynamic_uv = TRUE}, a 3D
+array (n x R x T) whose periods factor the posterior mean product of each
+period at rank R and are aligned across periods; \code{NA} for an actor
+absent from a period (see \code{\link{latent_positions}})}
+\item{V}{multiplicative column effects v (asymmetric case), with the same
+layout as \code{U}}
+\item{U_sd, V_sd}{for \code{dynamic_uv = TRUE} with saved latent draws (the
+default), the posterior standard deviation of each reported coordinate,
+same shape as \code{U} and \code{V}; \code{latent_positions()} reports
+them as \code{posterior_sd}}
 \item{UVPM}{on the union of actors; under changing composition the dynamic array has NA rows and columns for actors absent from a period, and a static fit gives one matrix for every pair. posterior mean of UV}
 \item{ULUPM}{posterior mean of ULU (symmetric case)}
 \item{L}{for symmetric fits, the diagonal of the product \eqn{U L U'}: the
-eigenvalues of \code{ULUPM} when the positions are static, and when they
-are dynamic the posterior mean of the diagonal drawn every sweep, the
-coordinate paths then having unit stationary variance so that \code{L}
-carries the scale and the sign of each direction}
+eigenvalues of \code{ULUPM} when the positions are static; when they are
+dynamic, one diagonal for every period that carries the scale and sign of
+each direction, so that \eqn{U_t L U_t'} is the best rank-R part of each
+period's \code{ULUPM} with those signs}
 \item{EZ}{posterior mean of the linear predictor Z, on the link scale
 for every family (the log rate for Poisson, the probit scale for the
 binary, ordinal, cbin and frn families); \code{YPM} is the response-scale
@@ -1646,7 +1649,10 @@ scale of the deviation innovation variance, fixed before sampling}
 inverse-gamma scale of the coefficient innovation variance, fixed before
 sampling from the response scale}
 \item{G}{for bipartite fits, the interaction matrix of \eqn{U G V'}: the
-posterior mean of the gauged draws}
+posterior mean of the gauged draws when the positions are static; when they
+are dynamic, a diagonal matrix fixed across periods that carries the scale,
+so that \eqn{U_t G V_t'} is the best rank-R part of each period's
+\code{UVPM}}
 \item{GOF}{a named list with one element per goodness-of-fit statistic
 (\code{sd.rowmean}, \code{sd.colmean}, \code{dyad.dep}, \code{cycle.dep},
 \code{trans.dep}; for \code{mode = "bipartite"}, \code{sd.rowmean},

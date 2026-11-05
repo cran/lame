@@ -916,7 +916,7 @@ test_that("the compiled hidden-cell draw gives the R reference's draws", {
 		rho = if (bip) 0 else 0.3
 		set.seed(9); z_c = lame:::.lame_cbin_hidden_moves(Z, EZ, rho, Y, 3, hid, bip)
 		set.seed(9); z_r = lame:::.lame_cbin_hidden_moves_r(Z, EZ, rho, Y, 3, hid, bip)
-		expect_identical(z_c, z_r)
+		expect_equal(z_c, z_r, tolerance = 1e-10)
 	}
 })
 

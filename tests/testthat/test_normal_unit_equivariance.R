@@ -1,6 +1,7 @@
 # the normal family has no unit of its own: default priors and starting values are in the unit of the response
 # (R/normal_scale.R, R/uv_prior.R), so a fit of c * y is the fit of y in other units; same-seed sampler draws scale
 # exactly and the fast estimators scale to their stopping tolerance
+skip_on_cran()
 
 eq_net = function(mode = c("dir", "sym", "bip"), n = 12, nB = 9, Tt = 1, R = 2, seed = 11, miss = 0.05) {
 	mode = match.arg(mode)

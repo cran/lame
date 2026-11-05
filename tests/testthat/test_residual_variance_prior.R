@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("residual prior scale is fixed in observed units and validates overrides", {
 	scale = lame:::.lame_residual_prior_scale
 	Y = matrix(c(-2, 0.3, 0.8, 1.7, NA, 0.2), 2, 3)

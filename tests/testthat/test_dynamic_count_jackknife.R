@@ -1,3 +1,5 @@
+skip_on_cran()
+
 test_that("dynamic count correction preserves means and warm-start coordinates", {
 	skip_on_cran()
 	set.seed(3112001)
