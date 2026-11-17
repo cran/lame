@@ -23,6 +23,11 @@ data(addhealthc3)
 Y <- (addhealthc3$Y > 0) * 1
 X_nodes <- addhealthc3$X
 
+# keep the students whose covariates are all recorded
+has_covs <- complete.cases(X_nodes)
+Y <- Y[has_covs, has_covs]
+X_nodes <- X_nodes[has_covs, ]
+
 n <- nrow(Y)
 cat("Students:", n, "\n")
 cat("Friendships:", sum(Y, na.rm = TRUE), "\n")
@@ -75,7 +80,7 @@ for (k in 1:4) diag(Xdyad[, , k]) <- NA
 Xrow <- X_nodes[, c("female", "grade")]
 Xcol <- X_nodes[, c("female", "grade")]
 
-## ----fit-model, message=FALSE, warning=FALSE----------------------------------
+## ----fit-model----------------------------------------------------------------
 fit <- ame(
 	Y,
 	Xdyad = Xdyad,
@@ -86,9 +91,6 @@ fit <- ame(
 	rvar = TRUE, # sender random effects
 	cvar = TRUE, # receiver random effects
 	dcor = TRUE, # dyadic correlation (reciprocity)
-	burn = 100, # short burn-in for this example
-	nscan = 500, # short run for this example
-	odens = 25, # thinning
 	verbose = FALSE,
 	posterior_opts = posterior_options(
 		save_ab = TRUE, save_UV = TRUE,
@@ -106,14 +108,15 @@ trace_plot(fit, params = "beta", ncol = 3)
 ## ----trace-rho, fig.width=8, fig.height=5, fig.alt="MCMC trace and density plot for the dyadic correlation (rho); the trace should fluctuate around a stable mean."----
 trace_plot(fit, params = "variance", include = "Dyadic correlation")
 
-## ----as-draws-rhat-ess, eval = run_vignette && requireNamespace("posterior", quietly = TRUE), message = FALSE, warning = FALSE----
+## ----as-draws-rhat-ess, eval = run_vignette && requireNamespace("posterior", quietly = TRUE), message = FALSE----
 library(posterior)
 draws <- posterior::as_draws(fit) # draws_array [iter, chain, var]
 # mean, sd, quantiles, rhat and ESS for each parameter
-posterior::summarise_draws(draws)
+draw_summary <- posterior::summarise_draws(draws)
+draw_summary
 
 ## ----ame-chains, eval = FALSE-------------------------------------------------
-# # four longer chains for a convergence assessment
+# # four chains from different seeds
 # fit_mc <- ame(
 # 	Y,
 # 	Xdyad = Xdyad,
@@ -121,9 +124,6 @@ posterior::summarise_draws(draws)
 # 	Xcol = Xcol,
 # 	family = "binary",
 # 	R = 2,
-# 	burn = 1000,
-# 	nscan = 5000,
-# 	odens = 25,
 # 	chains = 4,
 # 	cores = 4, # forked on Unix; sequential on Windows
 # 	verbose = FALSE
@@ -137,33 +137,27 @@ str(fit$mh_counters)
 prior_summary(fit)
 
 ## ----loo-cross, eval = FALSE--------------------------------------------------
-# # two candidates with independent residuals and saved log-likelihoods
+# # additive model with the dyadic covariates
 # fit_ll <- ame(
 # 	Y,
 # 	Xdyad = Xdyad,
 # 	Xrow = Xrow,
 # 	Xcol = Xcol,
 # 	family = "binary",
-# 	R = 2,
+# 	R = 0,
 # 	dcor = FALSE,
-# 	burn = 1000,
-# 	nscan = 5000,
-# 	odens = 25,
 # 	save_log_lik = TRUE,
 # 	verbose = FALSE
 # )
 # 
-# # alternative model without the dyadic covariates
+# # the same model without them
 # fit_ll_null <- ame(
 # 	Y,
 # 	Xrow = Xrow,
 # 	Xcol = Xcol,
 # 	family = "binary",
-# 	R = 2,
+# 	R = 0,
 # 	dcor = FALSE,
-# 	burn = 1000,
-# 	nscan = 5000,
-# 	odens = 25,
 # 	save_log_lik = TRUE,
 # 	verbose = FALSE
 # )
@@ -171,7 +165,7 @@ prior_summary(fit)
 # loo_dyad <- loo::loo(fit_ll)
 # loo_null <- loo::loo(fit_ll_null)
 # 
-# loo_dyad # check the Pareto k table first
+# loo_dyad # elpd_loo and the Pareto k table
 # 
 # loo::loo_compare(list(with_dyad = loo_dyad, no_dyad = loo_null))
 
@@ -293,9 +287,6 @@ fit_train <- ame(
 	rvar = TRUE,
 	cvar = TRUE,
 	dcor = TRUE,
-	burn = 30,
-	nscan = 100,
-	odens = 5, # short run for the vignette
 	verbose = FALSE,
 	gof = FALSE
 )
@@ -324,6 +315,47 @@ cat(
 	sum(Y[test_idx] == 1),
 	"\n"
 )
+
+## ----heldout-rank, eval = FALSE-----------------------------------------------
+# # five stratified folds over the dyads, the same for both models
+# set.seed(6886)
+# scored <- which(row(Y) != col(Y))
+# fold <- integer(length(Y))
+# for (v in 0:1) {
+# 	idx <- scored[Y[scored] == v]
+# 	fold[idx] <- sample(rep(1:5, length.out = length(idx)))
+# }
+# 
+# # fit one model with a fold masked, then score that fold
+# score_fold <- function(k, R) {
+# 	Y_k <- Y
+# 	Y_k[fold == k] <- NA
+# 	fit_k <- ame(
+# 		Y_k,
+# 		Xdyad = Xdyad,
+# 		Xrow = Xrow,
+# 		Xcol = Xcol,
+# 		R = R,
+# 		family = "binary",
+# 		gof = FALSE,
+# 		verbose = FALSE
+# 	)
+# 	m <- evaluate_heldout(
+# 		y_obs = Y,
+# 		y_pred = predict(fit_k, type = "response"),
+# 		mask = matrix(fold == k, nrow(Y), dimnames = dimnames(Y)),
+# 		family = "binary"
+# 	)
+# 	data.frame(R = R, fold = k, m[c("n_eval", "auroc", "auprc", "logloss")])
+# }
+# cv <- do.call(rbind, lapply(c(0, 2), function(R) {
+# 	do.call(rbind, lapply(1:5, score_fold, R = R))
+# }))
+# 
+# # mean ranking metrics over the folds, and the log score summed over the held-out dyads
+# cv$log_score <- -cv$logloss * cv$n_eval
+# aggregate(cbind(auroc, auprc) ~ R, data = cv, FUN = mean)
+# aggregate(log_score ~ R, data = cv, FUN = sum)
 
 ## ----simulation, fig.width=8, fig.height=4, fig.alt="Posterior predictive check histogram of simulated network densities with a dashed vertical line marking the observed density. Overlap indicates the model reproduces the observed density."----
 sims <- simulate(fit, nsim = 100)

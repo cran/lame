@@ -56,7 +56,7 @@ fit <- lame(
 	R = 0,
 	dynamic_beta = "dyad", # the trade coefficient is AR(1)
 	dynamic_beta_kind = "ar1", # mean-reverting; switch to "rw1" for drift
-	nscan = 150,
+	nscan = 300,
 	burn = 30,
 	odens = 5,
 	verbose = FALSE
@@ -175,7 +175,7 @@ autoplot(fit, probs = c(0.025, 0.5, 0.975)) +
 		x = "Time period", y = "Coefficient value"
 	)
 
-## ----sparse-fail--------------------------------------------------------------
+## ----drift-fit----------------------------------------------------------------
 set.seed(2026)
 n_sp <- 20
 T_sp <- 4
@@ -198,70 +198,55 @@ Y_sp <- lapply(seq_len(T_sp), function(t) {
 names(Y_sp) <- paste0("t", seq_len(T_sp))
 sapply(Y_sp, function(y) round(mean(y, na.rm = TRUE), 3)) # sparse early on
 
-fit_sparse <- lame(
-	Y_sp,
-	Xdyad = X_sp,
-	family = "binary",
-	R = 0,
-	dynamic_beta = "dyad",
-	dynamic_beta_kind = "ar1",
-	nscan = 400,
-	burn = 100,
-	odens = 5,
-	verbose = FALSE
-)
-round(quantile(fit_sparse$RHO_BETA, c(0.5, 0.975)), 3)
+fit_drift <- lapply(c(ar1 = "ar1", rw1 = "rw1"), function(kind) {
+	lame(
+		Y_sp,
+		Xdyad = X_sp,
+		family = "binary",
+		R = 0,
+		dcor = FALSE,
+		dynamic_beta = "dyad",
+		dynamic_beta_kind = kind,
+		nscan = 250,
+		burn = 50,
+		odens = 5,
+		verbose = FALSE
+	)
+})
+# estimated coefficient path under each transition model
+round(t(sapply(fit_drift, function(f) coef(f)["sanction_risk_dyad", ])), 3)
 
-## ----sparse-fail-warn---------------------------------------------------------
-set.seed(1)
-fc_sparse <- predict(
-	fit_sparse,
-	h = 6,
-	type = "response",
-	interval = "credible"
-)
-
-## ----sparse-fail-width, fig.width = 6, fig.height = 3.2, fig.alt="Line plot comparing the across-dyad mean 95 percent forecast interval width at horizons one through six for the Step 1 fit and the sparse drifting-panel fit. These intervals are on the bounded probability scale."----
-set.seed(1)
-fc_healthy <- predict(
-	fit,
-	h = 6,
-	type = "response",
-	interval = "credible"
-)
-width_by_h <- function(fc) {
-	sapply(fc, function(m) mean(m$upper - m$lower, na.rm = TRUE))
+## ----drift-forecast, fig.width = 6, fig.height = 3.2, fig.alt="Line plot of the forecast coefficient on sanction_risk at horizons one through six under the AR(1) and RW1 transition models fitted to the drifting panel. The AR(1) line declines toward the long-run mean; the RW1 line stays at the last fitted level."----
+x_at <- function(value) {
+	lapply(seq_len(6), function(h) {
+		array(
+			value,
+			dim = c(n_sp, n_sp, 1),
+			dimnames = list(NULL, NULL, "sanction_risk")
+		)
+	})
 }
-w_healthy <- width_by_h(fc_healthy)
-w_sparse <- width_by_h(fc_sparse)
-round(rbind(mean_reverting = w_healthy, near_unit_root = w_sparse), 3)
+# the same seed gives both forecasts the same coefficient draws
+beta_forecast <- function(f) {
+	set.seed(1)
+	fc_one <- predict(f, h = 6, type = "link", newdata = x_at(1))
+	set.seed(1)
+	fc_zero <- predict(f, h = 6, type = "link", newdata = x_at(0))
+	mapply(function(a, b) mean(a - b, na.rm = TRUE), fc_one, fc_zero)
+}
+beta_fc <- sapply(fit_drift, beta_forecast)
+round(t(beta_fc), 3)
 
-# share of high-|sanction_risk| dyads whose h = 3 interval spans nearly [0, 1]
-x_last <- X_sp[[T_sp]][, , 1]
-hi_x <- abs(x_last) >= quantile(abs(x_last), 0.9)
-deg_h3 <- mean(
-	fc_sparse[[3]]$lower[hi_x] < 0.05 &
-		fc_sparse[[3]]$upper[hi_x] > 0.95,
-	na.rm = TRUE
+drift_df <- data.frame(
+	h = rep(seq_len(6), 2),
+	model = rep(c("AR(1)", "RW1"), each = 6),
+	coefficient = c(beta_fc[, "ar1"], beta_fc[, "rw1"])
 )
-round(deg_h3, 2)
-
-width_df <- data.frame(
-	h = rep(seq_along(w_healthy), 2),
-	fit = rep(
-		c(
-			"mean-reverting (Step 1 fit)",
-			"near-unit-root (sparse fit)"
-		),
-		each = length(w_healthy)
-	),
-	width = c(w_healthy, w_sparse)
-)
-ggplot(width_df, aes(h, width, linetype = fit)) +
+ggplot(drift_df, aes(h, coefficient, linetype = model)) +
 	geom_line() + geom_point(size = 1.8) +
 	labs(
-		title = "Forecast interval width by horizon",
-		x = "Forecast horizon h", y = "Mean 95% interval width"
+		title = "Forecast coefficient by horizon",
+		x = "Forecast horizon h", y = "Coefficient on sanction_risk"
 	) +
 	theme_bw(base_size = 9) +
 	theme(
@@ -285,8 +270,8 @@ lfo_res <- lfo(
 	fit,
 	periods = lfo_periods,
 	refit = TRUE,
-	nscan = 100,
-	burn = 25,
+	nscan = 500,
+	burn = 100,
 	odens = 5,
 	verbose = FALSE
 )

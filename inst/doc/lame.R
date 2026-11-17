@@ -107,6 +107,15 @@ cat("Residual SD:", round(sd(unlist(resid_list), na.rm = TRUE), 3), "\n")
 ## ----trace-plot, fig.height=5, fig.alt="MCMC trace and density plots for the regression coefficients (intercept and similarity_dyad); well-mixed traces and unimodal densities indicate adequate convergence."----
 trace_plot(fit, params = "beta")
 
+## ----gof-inside, include = FALSE----------------------------------------------
+# observed statistics inside their 95% posterior-predictive bands
+gof_in_band <- unlist(lapply(fit$GOF, function(g) {
+	band <- apply(g[, -1, drop = FALSE], 1, quantile, probs = c(0.025, 0.975), na.rm = TRUE)
+	g[, 1] >= band[1, ] & g[, 1] <= band[2, ]
+}))
+gof_inside <- sum(gof_in_band, na.rm = TRUE)
+gof_total <- sum(!is.na(gof_in_band))
+
 ## ----gof-plot, fig.width=8, fig.height=5, fig.alt="Longitudinal goodness-of-fit panels: each facet plots one network statistic (sender/receiver degree heterogeneity, dyadic dependence, triadic dependence, transitivity) across time. The observed series is a solid black line with points; the posterior-predictive median is a dashed grey line; the 95 percent credible interval is a grey band."----
 gof_plot(fit)
 
